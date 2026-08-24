@@ -81,7 +81,7 @@ public class Jogo {
                 3 - Ignorar a figura e se esgueirar
                 """;
 
-        String mensagem1 = "A figura emite um som de estalo com a língua. Você sente um arrepio na espinha.";
+        String mensagem1 = "A figura emite um som de estalo com a língua. Você sente um arrepio na espinha.\n";
         String mensagem2 = "A figura lhe encara, apesar de não ter olhos.";
         String mensagem3 = "A figura lhe escuta ao passar. Você fica inseguro de dar as costas pra ela.";
 
@@ -92,20 +92,28 @@ public class Jogo {
         System.out.println(texto);
 
         int opcao = recebeOpcao();
+        boolean valida = false;
 
-        switch (opcao) {
-            case 1:
-                System.out.println(mens1);
-                break;
-            case 2:
-                System.out.println(mens2);
-                break;
-            case 3:
-                System.out.println(mens3);
-                break;
-            default:
-                System.out.println("Escolha inválida.");
-                break;
+        while (!valida) {
+            switch (opcao) {
+                case 1:
+                    System.out.println(mens1);
+                    valida = true;
+                    break;
+                case 2:
+                    System.out.println(mens2);
+                    valida = true;
+                    break;
+                case 3:
+                    System.out.println(mens3);
+                    valida = true;
+                    break;
+                default:
+                    System.out.println("Escolha inválida.");
+                    opcao = recebeOpcao();
+                    break;
+
+            }
         }
     }
 }

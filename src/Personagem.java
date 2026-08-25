@@ -26,4 +26,8 @@ public class Personagem {
      public void aumentaAfinidade(int quantidade) {
          this.afinidade += quantidade;
      }
+    
+     public void reduzAfinidade(int quantidade) {
+         this.afinidade -= quantidade;
+     }
 }

@@ -1,35 +1,28 @@
 import java.util.Scanner;
 
 public class Jogo {
-    public static void main(String[] args) {
-        Jogo jogo = new Jogo();
 
+    public void novoJogo() {
         int opcao_escolhida = -1;
-        while (opcao_escolhida != 3) {
-            jogo.printaOpcoesIniciais();
 
-            opcao_escolhida = jogo.recebeOpcao();
+        while (opcao_escolhida != 3) {
+            printaOpcoesIniciais();
+            opcao_escolhida = recebeOpcao();
 
             switch (opcao_escolhida) {
                 case 1:
-                    // caso 1
                     System.out.println("\nPartida iniciada\n");
-                    jogo.iniciarPartida();
+                    iniciarPartida();
                     break;
                 case 2:
-                    // caso 2
-                    jogo.mostraInstrucoes();
+                    mostraInstrucoes();
                     break;
                 case 3:
-                    // caso 3
                     System.out.println("Saída");
                     break;
-
                 default:
-                    // demais casos
                     System.out.println("\nOpção inválida\n");
                     break;
-
             }
         }
     }
@@ -43,11 +36,8 @@ public class Jogo {
 
     public int recebeOpcao() {
         Scanner scanner = new Scanner(System.in);
-
         System.out.println("Digite a opcao desejada: ");
-        int opcao = scanner.nextInt();
-
-        return opcao;
+        return scanner.nextInt();
     }
 
     public void mostraInstrucoes() {
@@ -74,7 +64,9 @@ public class Jogo {
     }
 
     public void iniciarPartida() {
-        Personagem enoch = new Personagem("Enoch", 320, "Masculino", "Humano", 0);
+        Personagem mc = new Personagem("Enoch", 320, "Masculino", "Humano", 0);
+        //mc = mc.criaPersonagem();
+        //Adicionar o prologo do jogo nesse metido//
 
         String texto = """
                 Você se depara com uma figura andando pelos corredores.
@@ -85,16 +77,16 @@ public class Jogo {
                 """;
 
         String mensagem1 = "A figura emite um som de estalo com a língua. Você sente um arrepio na espinha.\n";
-        String mensagem2 = "A figura lhe encara, apesar de não ter olhos. Ela pronuncia:\n ..." + enoch.getNome() + "...";
+        String mensagem2 = "A figura lhe encara, apesar de não ter olhos. Ela pronuncia:\n ..." + mc.getNome() + "...";
         String mensagem3 = "A figura lhe escuta ao passar. Você fica inseguro de dar as costas pra ela.";
-
+        System.out.println(texto);
+        System.out.println(mensagem1);
+        System.out.println(mensagem2);
+        System.out.println(mensagem3);
         menuEscolha();
     }
 
     public int menuEscolha() {
-        // o propósito desse "menu atualizado" que substituirá o "menuEscolha" anterior é para melhor modularizar o código
-        // nesse caso, o menu de escolha não vai mais receber nem printar mensagens de escolhas, ele somente se encarrega de retonar o valor da escolha se for válida
-
         int opcao = recebeOpcao();
         boolean valida = false;
 
@@ -108,6 +100,4 @@ public class Jogo {
             }
         }
         return opcao;
-    } // retorna a opção escolhida que vai ser utilizada em outro módulo de controle da narrativa
-
-}
+    }

@@ -26,17 +26,17 @@ public class Item {
     }
 
     public void Consumir(int quantidade) {
-        if (item_quant > quantidade) {
-            item_quant -= quantidade;
+        if (item_quant >= quantidade) {
+            this.item_quant -= quantidade;
             System.out.println("Você Consumiu: " + getNome());
         } else {
-            System.out.println("Você não tem " + getNome() + "suficientes para isso!");
+            System.out.println("Você não tem " + getNome() + " suficientes para isso!");
         }
     }
 
     public void Incrementar(int quantidade) {
         //if(item<0) tem que criar o item aq? ou só pode incrementar se já existir o item no inventário
-        item_quant += quantidade;
+        this.item_quant += quantidade;
         System.out.println("Você coleutou " + quantidade + getNome());
     }
 }

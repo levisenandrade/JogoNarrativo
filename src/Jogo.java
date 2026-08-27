@@ -66,24 +66,42 @@ public class Jogo {
     public void iniciarPartida() {
         Personagem mc = new Personagem("Enoch", 320, "Masculino", "Humano", 0);
         //mc = mc.criaPersonagem();
-        //Adicionar o prologo do jogo nesse metido//
 
-        String texto = """
-                Você se depara com uma figura andando pelos corredores.
-                
-                1 - Seguir a figura
-                2 - Chamar a figura
-                3 - Ignorar a figura e se esgueirar
+        Menu menu = new Menu();
+
+        String textoPrologo = """
+                PRÓLOGO
+                Você acorda e se vê num lugar desolado... Ao longe, pode ver uma cidade flutuante...
                 """;
 
-        String mensagem1 = "A figura emite um som de estalo com a língua. Você sente um arrepio na espinha.\n";
-        String mensagem2 = "A figura lhe encara, apesar de não ter olhos. Ela pronuncia:\n ..." + mc.getNome() + "...";
-        String mensagem3 = "A figura lhe escuta ao passar. Você fica inseguro de dar as costas pra ela.";
-        System.out.println(texto);
-        System.out.println(mensagem1);
-        System.out.println(mensagem2);
-        System.out.println(mensagem3);
-        menuEscolha();
+        System.out.println(textoPrologo);
+
+        Cena cena1 = new Cena("Você vê uma figura de costas andando vagarosamente.", "Seguir a figura",
+                "Chamar a figura ", "Ignorar a figura", menu);
+
+        int opcao_c1 = cena1.executarCena();
+
+        switch (opcao_c1) {
+            case 1:
+                Cena cena11 = new Cena("A figura lhe escuta ao passar. Você fica inseguro de dar as costas pra ela.", "Sacar espada", "Permanecer parado",
+                        "Fugir", menu);
+                cena11.executarCena();
+                break;
+            case 2:
+                Cena cena12 = new Cena("A figura lhe encara, apesar de não ter olhos. Ela pronuncia:\n ..." + mc.getNome() + "...", "Sacar espada",
+                        "Permanecer parado", "Fugir", menu);
+                cena12.executarCena();
+                break;
+            case 3:
+                Cena cena13 = new Cena("A figura emite um som irreconhecível. Você sente um arrepio na espinha.", "Sacar espada",
+                        "Permanecer parado", "Fugir", menu);
+                cena13.executarCena();
+                break;
+            default:
+                System.out.println("Opcao invalida");
+                break;
+        }
+
     }
 
     public int menuEscolha() {
@@ -101,3 +119,4 @@ public class Jogo {
         }
         return opcao;
     }
+}

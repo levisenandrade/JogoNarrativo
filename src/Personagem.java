@@ -15,6 +15,7 @@ public class Personagem {
         this.afinidade = afinidade;
 
     }
+
     public Personagem criaPersonagem() {
         Scanner scanner = new Scanner(System.in);
 
@@ -30,12 +31,13 @@ public class Personagem {
         System.out.println("Digite a raça do personagem:");
         String novo_raca = scanner.nextLine();
 
-        System.out.println("Digite a afinidade do personagem (número):");
+        System.out.println("Digite a afinidade do personagem (número): ");
         int novo_afinidade = scanner.nextInt();
         scanner.nextLine(); // Consome a quebra de linha pendente
 
         return new Personagem(novo_nome, nova_idade, novo_sexo, novo_raca, novo_afinidade);
     }
+
     public String getNome() {
         return this.nome;
     }

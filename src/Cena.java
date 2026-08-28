@@ -1,5 +1,3 @@
-import java.util.Scanner;
-
 public class Cena {
     // Classe Cena recebe apenas o texto da cena e as opções disponíveis
     // visto que eventualmente uma consequência pode ser mais que só mostrar a mensagem

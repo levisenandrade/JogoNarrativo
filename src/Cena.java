@@ -16,7 +16,7 @@ public class Cena {
 
 
     //Criação de Dialogo que possui somente Texto
-    public void adicionarDialgoSemOpcoes(String texto) {
+    public void adicionaDialogoSemOpcoes(String texto) {
         if (dialogoAtual < arrayDialogos.length) {
             arrayDialogos[dialogoAtual] = new Dialogo(texto);
             dialogoAtual += 1;

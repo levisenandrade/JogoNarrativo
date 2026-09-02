@@ -1,7 +1,7 @@
-import java.util.Scanner;
-
 public class Dialogo {
-    private Scanner scanner;
+
+    private Entrada entrada;
+    private Personagem personagem;
     private String texto;
     private String opcao1;
     private String opcao2;
@@ -11,9 +11,10 @@ public class Dialogo {
     private String[] arrayDeAtributosAfetados;
     private int[] arrayDeValoresCorrespondentes;
 
-    //Construtor de Dialogs sem opções
-    public Dialogo(String texto) {
-        this.scanner = new Scanner(System.in);
+    // Construtor de diálogo sem opções
+    public Dialogo(Personagem personagem, String texto, Entrada entrada) {
+        this.personagem = personagem;
+        this.entrada = entrada;
         this.texto = texto;
 
         this.opcao1 = null;
@@ -21,8 +22,19 @@ public class Dialogo {
         this.opcao3 = null;
     }
 
-    public Dialogo(String texto, String opcao1, String opcao2, String opcao3,String[] atributos, int[] valores) {
-        this.scanner = new Scanner(System.in);
+    // Construtor de diálogo com opções
+    public Dialogo(
+            Personagem personagem,
+            String texto,
+            String opcao1,
+            String opcao2,
+            String opcao3,
+            String[] atributos,
+            int[] valores,
+            Entrada entrada
+    ) {
+        this.personagem = personagem;
+        this.entrada = entrada;
         this.texto = texto;
 
         this.arrayDeAtributosAfetados = atributos;
@@ -32,18 +44,26 @@ public class Dialogo {
         this.opcao2 = opcao2;
         this.opcao3 = opcao3;
     }
+
     public void executarDialogo() {
-        if(opcao1!= null){
-            System.out.println(texto);
+        // verifica se o nome do personagem que emite a frase é diferente de "Narrador"
+        // o nome do narrador não deve ser exibido
+
+        if (!personagem.getNome().equalsIgnoreCase("Narrador")) {
+            System.out.println(personagem.getNome() + ":");
+        }
+
+        System.out.println(texto);
+
+        if (opcao1 != null) {
             System.out.println(opcao1);
             System.out.println(opcao2);
             System.out.println(opcao3);
-            this.opcaoEscolhida= validaOpcao();
-        }
-        else{
-            System.out.println(texto);
+
+            this.opcaoEscolhida = validaOpcao();
         }
     }
+
     public int validaOpcao() {
         int opcao = recebeOpcao();
         boolean invalida = true;
@@ -60,24 +80,25 @@ public class Dialogo {
         return opcao;
     }
 
-
     public int recebeOpcao() {
         System.out.println("Digite a opção desejada: ");
-        return this.scanner.nextInt();
+        return entrada.lerInteiro();
     }
 
     public int getEscolha() {
         return opcaoEscolhida;
     }
+
     public boolean possuiOpcoes() {
         return opcao1 != null;
     }
 
-    public String getAtributo(){
-        return arrayDeAtributosAfetados[opcaoEscolhida-1];
+    public String getAtributo() {
+        return arrayDeAtributosAfetados[opcaoEscolhida - 1];
     }
 
-    public int getValor(){
-        return arrayDeValoresCorrespondentes[opcaoEscolhida-1];
+    public int getValor() {
+        return arrayDeValoresCorrespondentes[opcaoEscolhida - 1];
     }
+
 }

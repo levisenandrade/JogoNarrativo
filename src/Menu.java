@@ -1,26 +1,75 @@
-import java.util.Scanner;
-
 public class Menu {
 
-    public int recebeOpcao() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Digite a opcao desejada: ");
-        return scanner.nextInt();
+    private Entrada entrada;
+
+    public Menu(Entrada entrada) {
+        this.entrada = entrada;
     }
+
+    public String recebeNome() {
+        System.out.println("Digite o nome do protagonista:");
+        return entrada.lerString();
+    }
+
+    public int recebeIdade() {
+        System.out.println("Digite a idade do protagonista:");
+        return entrada.lerInteiro();
+    }
+
+    public String recebeGenero() {
+        System.out.println("Digite o genero do protagonista:");
+        return entrada.lerString();
+    }
+
+    public int recebeOpcao() {
+        System.out.println("Digite a opcao desejada: ");
+        return entrada.lerInteiro();
+    }
+
     public int validaOpcao() {
         int opcao = recebeOpcao();
-        boolean invalida = true;
 
-        while (invalida) {
-            if (opcao == 1 || opcao == 2 || opcao == 3) {
-                invalida = false;
-            } else {
-                System.out.println("Escolha inválida.");
-                opcao = recebeOpcao();
-            }
+        while (opcao != 1 && opcao != 2 && opcao != 3) {
+            System.out.println("Escolha inválida.");
+            opcao = recebeOpcao();
         }
 
         return opcao;
     }
-}
 
+    public void mostraInstrucoes() {
+        System.out.println("""
+                \n===== INSTRUÇÕES =====
+                
+                Bem-vindo ao nosso jogo narrativo interativo!
+
+                Você assumirá o papel do protagonista e deverá tomar decisões
+                ao longo da história. Suas escolhas poderão alterar os
+                acontecimentos, os relacionamentos com outros personagens,
+                o acesso a determinadas cenas e até mesmo o final da história.
+                
+                Durante a aventura, fique atento às informações apresentadas
+                e pense bem antes de escolher. Algumas consequências podem
+                não ser percebidas imediatamente.
+                
+                O jogo é baseado em narrativa e escolhas. Não existe apenas
+                um caminho correto: diferentes decisões podem levar a
+                diferentes acontecimentos e finais.
+                
+                Boa sorte e boa história!
+                """);
+    }
+
+    public void mostraMenu(){
+        System.out.println("""
+        ================  MENU ================
+        1 - Iniciar partida
+        2 - Instruções
+        3 - Sair
+        """);
+    }
+
+    public void mostraSaida(){
+        System.out.println("Saída");
+    }
+}

@@ -53,9 +53,9 @@ public class Controlador {
                         "Neutro"
                 );
 
-        Escolha escolha1 = new Escolha("1 - Ir até o carro");
-        Escolha escolha2 = new Escolha("2 - Continuar andando");
-        Escolha escolha3 = new Escolha("3 - Voltar pelo caminho");
+        Escolha escolha1 = new Escolha("1 - Ir até o carro", "Paranoia", 3);
+        Escolha escolha2 = new Escolha("2 - Continuar andando", "Razão", 3);
+        Escolha escolha3 = new Escolha("3 - Voltar pelo caminho", "Paranoia", -5);
 
         prologo.adicionaDialogoSemOpcoes(
                 narrador,
@@ -101,11 +101,20 @@ public class Controlador {
                 null,
                 null
         );
+        // teste de funcionamento para ver se a alteração de valor do atributo realmetne ta funcioandno
+        System.out.println(
+                "Paranoia: " + protagonista.getAtributo("Paranoia")
+        );
 
-        executaCena(prologo);
+        executaCena(prologo, protagonista);
+
+        // teste de funcionamento para ver se a alteração de valor do atributo realmetne ta funcioandno
+        System.out.println(
+                "Paranoia: " + protagonista.getAtributo("Paranoia")
+        );
     }
 
-    public void executaCena(Cena cena) {
+    public void executaCena(Cena cena, Protagonista protagonista) {
 
         for (int i = 0; i < cena.getQuantidadeDialogos(); i++) {
 
@@ -118,7 +127,12 @@ public class Controlador {
 
                 Escolha escolhaSelecionada = dialogo.getEscolha(escolha);
 
-                System.out.println(escolhaSelecionada.getTexto()); // linha para testar se o preocesso de escolha esta realmetne fuincioando 
+                System.out.println(escolhaSelecionada.getTexto()); // linha para testar se a escolha está realmeten funcionando
+
+                protagonista.alteraAtributo(
+                        escolhaSelecionada.getAtributoAfetado(),
+                        escolhaSelecionada.getValorAlteracao()
+                );
             }
         }
     }

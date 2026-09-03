@@ -44,7 +44,7 @@ public class Controlador {
         Protagonista protagonista =
                 new Protagonista(nome, idade, genero);
 
-        Cena prologo = new Cena(entrada);
+        Cena prologo = new Cena();
 
         Personagem narrador =
                 new Personagem(
@@ -52,6 +52,10 @@ public class Controlador {
                         0,
                         "Neutro"
                 );
+
+        Escolha escolha1 = new Escolha("1 - Ir até o carro");
+        Escolha escolha2 = new Escolha("2 - Continuar andando");
+        Escolha escolha3 = new Escolha("3 - Voltar pelo caminho");
 
         prologo.adicionaDialogoSemOpcoes(
                 narrador,
@@ -85,6 +89,37 @@ public class Controlador {
                 """
         );
 
-        prologo.executaDialogos();
+        prologo.adicionaDialogoComOpcoes(
+                narrador,
+                """
+                Você olha ao redor. A rua está completamente vazia.
+                Há um carro estacionado alguns metros à frente.
+                """,
+                escolha1,
+                escolha2,
+                escolha3,
+                null,
+                null
+        );
+
+        executaCena(prologo);
+    }
+
+    public void executaCena(Cena cena) {
+
+        for (int i = 0; i < cena.getQuantidadeDialogos(); i++) {
+
+            Dialogo dialogo = cena.getDialogo(i);
+
+            dialogo.executarDialogo();
+
+            if (dialogo.possuiOpcoes()) {
+                int escolha = menu.recebeEscolha();
+
+                Escolha escolhaSelecionada = dialogo.getEscolha(escolha);
+
+                System.out.println(escolhaSelecionada.getTexto()); // linha para testar se o preocesso de escolha esta realmetne fuincioando 
+            }
+        }
     }
 }

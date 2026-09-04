@@ -37,11 +37,9 @@ public class Cena {
     public void adicionaDialogoComOpcoes(
             Personagem personagem,
             String texto,
-            String op1,
-            String op2,
-            String op3,
-            String[] atributos,
-            int[] valores
+            Escolha escolha1,
+            Escolha escolha2,
+            Escolha escolha3
     ) {
 
         if (dialogoAtual < arrayDialogos.length) {
@@ -50,11 +48,9 @@ public class Cena {
                     new Dialogo(
                             personagem,
                             texto,
-                            op1,
-                            op2,
-                            op3,
-                            atributos,
-                            valores
+                            escolha1,
+                            escolha2,
+                            escolha3
                     );
 
             dialogoAtual += 1;

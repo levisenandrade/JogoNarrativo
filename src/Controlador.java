@@ -97,9 +97,7 @@ public class Controlador {
                 """,
                 escolha1,
                 escolha2,
-                escolha3,
-                null,
-                null
+                escolha3
         );
         // teste de funcionamento para ver se a alteração de valor do atributo realmetne ta funcioandno
         System.out.println(

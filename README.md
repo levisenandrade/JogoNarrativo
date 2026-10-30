@@ -2,7 +2,7 @@
 EXA863 - MI PROGRAMAÇÃO
 
 Componentes da dupla:
-* Levi Sena (https://github.com/bucolismo)
+* Levi Sena (https://github.com/levisenandrade)
 * Luis Felipe Batista (https://github.com/LuisB4tista)
 
 Tutor: Roberto Almeida Bittencourt

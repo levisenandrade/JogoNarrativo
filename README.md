@@ -15,6 +15,8 @@ Universidade Estadual de Feira de Santana (UEFS) — 2026.2
 
 Jogos narrativos interativos são aplicações em que o jogador conduz uma história por meio de escolhas, e em que cada decisão altera o rumo da trama, a relação com os personagens e o desfecho final. Por trás da experiência de leitura, existe um sistema que precisa controlar estado, regras de acesso, consequências e persistência de dados de forma organizada.
 
+A história se passa em Santa Aurora, onde o jogador assume o papel de um protagonista envolvido em uma investigação marcada por mistérios, suspeitas e relações com diferentes personagens. Ao longo da trama, suas escolhas influenciam o desenvolvimento da investigação, a confiança dos envolvidos e os caminhos que podem levar a diferentes desfechos.
+
 Este projeto teve como objetivo o desenvolvimento de um jogo narrativo interativo em linguagem Java, no estilo *visual novel*/RPG narrativo, seguindo os princípios da Programação Orientada a Objetos (POO) e o padrão arquitetural **MVC** (*Model-View-Controller*). Não foi utilizada nenhuma *engine* de jogos pronta: toda a lógica de narrativa, relacionamentos, atributos, recursos e finais foi implementada do zero.
 
 O desenvolvimento foi dividido em três fases:
@@ -22,8 +24,6 @@ O desenvolvimento foi dividido em três fases:
 * **Fase 1:** jogo jogável pelo terminal, com menu, protagonista configurável, ao menos 10 cenas, escolhas com consequências, relacionamentos, atributos, recursos e 3 finais distintos;
 * **Fase 2:** sistema de persistência em **JSON**, com múltiplos *slots* de save, salvamento manual e automático, sobrescrita, exclusão, configurações persistentes e exceções customizadas;
 * **Fase 3:** interface gráfica com **JavaFX**, preservando o MVC e aplicando padrões de projeto GoF.
-
-[PREENCHER: 1 ou 2 frases sobre a história/ambientação do jogo, sem spoilers dos finais.]
 
 ---
 

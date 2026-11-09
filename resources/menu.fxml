@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MenuController">
+   <center>
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="CENTER" prefHeight="64.0" prefWidth="183.0" text="Santan aurora" textAlignment="CENTER">
+               <font>
+                  <Font name="Arial Bold" size="15.0" />
+               </font>
+            </Label>
+            <Button mnemonicParsing="false" onAction="#aoIniciarOJogo" text="Iniciar o Jogo" />
+            <Button mnemonicParsing="false" text="Continuar Partida" />
+            <Button mnemonicParsing="false" text="Saves" />
+            <Button mnemonicParsing="false" text="Mostrar Conquistas" />
+            <Button mnemonicParsing="false" text="Configurações" />
+            <Button mnemonicParsing="false" onAction="#aoMostrarInstrucao" text="Mostrar Instruções" />
+            <Button mnemonicParsing="false" onAction="#aoMostrarCreditos" text="Mostrar Créditos" />
+            <Button mnemonicParsing="false" onAction="#aoApertarSair" text="Sair" />
+         </children>
+      </VBox>
+   </center>
+</BorderPane>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="550.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="InstrucoesController">
+
+    <children>
+
+        <Label layoutX="310.0" layoutY="20.0" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="INSTRUÇÕES" />
+
+        <Label layoutX="40.0" layoutY="70.0" prefWidth="670.0" style="-fx-font-size: 14px;" text="Bem-vindo ao nosso jogo narrativo interativo!  Você assumirá o papel do protagonista e deverá tomar decisões ao longo da história. Suas escolhas poderão alterar os acontecimentos, os relacionamentos com outros personagens, o acesso a determinadas cenas e até mesmo o final da história.  Durante a aventura, fique atento às informações apresentadas e pense bem antes de escolher. Algumas consequências podem não ser percebidas imediatamente.  O jogo é baseado em narrativa e escolhas. Não existe apenas um caminho correto: diferentes decisões podem levar a diferentes acontecimentos e finais.  O jogo salva automaticamente ao iniciar cada ato e, nesses mesmos pontos, você também pode salvar manualmente em um dos 3 slots. Use 'Continuar' ou 'Carregar partida' no menu para retomar.  Os finais que você alcançar e as conquistas que desbloquear ficam guardados entre as execuções do jogo. Consulte a seção 'Conquistas' para acompanhar seu progresso.  Em 'Configurações' você pode escolher se deseja visualizar alterações de atributos e relações após cada escolha, adicionar pausas entre diálogos e gerenciar seu personagem favorito.  Boa sorte e boa história!" wrapText="true" />
+
+        <Button layoutX="325.0" layoutY="332.0" mnemonicParsing="false" onAction="#aoVoltar" prefWidth="100.0" text="Voltar" />
+
+    </children>
+</AnchorPane>

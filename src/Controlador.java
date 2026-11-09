@@ -49,6 +49,17 @@ public class Controlador {
     }
 
     /**
+     * prepara o jogo para uso: lê as configurações e o progresso gravados em disco
+     *
+     * é chamado pelo menuInicial() (versão de terminal) e também pela App (versão JavaFX),
+     * que não usa o loop do menuInicial()
+     */
+    public void inicializar() {
+        carregarConfiguracoes();
+        carregarProgresso();
+    }
+
+    /**
      * mostra e controla o menu principal do jogo
      *
      * aqui o jogador pode iniciar uma partida, continuar ou carregar uma partida salva,
@@ -56,8 +67,7 @@ public class Controlador {
      */
     public void menuInicial() {
 
-        carregarConfiguracoes();
-        carregarProgresso();
+        inicializar();
 
         int opcao;
 
@@ -66,43 +76,56 @@ public class Controlador {
 
             opcao = menu.validaOpcao();
 
-            switch (opcao) {
-
-                case 1:
-                    iniciarPartida();
-                    break;
-
-                case 2:
-                    continuarPartida();
-                    break;
-
-                case 3:
-                    gerenciarSaves();
-                    break;
-
-                case 4:
-                    mostrarConquistas();
-                    break;
-
-                case 5:
-                    gerenciarConfiguracoes();
-                    break;
-
-                case 6:
-                    menu.mostraInstrucoes();
-                    break;
-
-                case 7:
-                    menu.mostraCreditos();
-                    break;
-
-                case 8:
-                    menu.mostraSaida();
-                    break;
-
-            }
+            executarOpcaoDoMenu(opcao);
 
         } while (opcao != 8);
+    }
+
+    /**
+     * executa a ação correspondente a uma opção do menu principal
+     *
+     * é usado pelo menuInicial() (versão de terminal, com o número digitado) e pode ser usado
+     * pela versão gráfica, em que cada botão chama este método com o número da sua opção
+     *
+     * @param opcao número da opção (1 a 8, o mesmo mostrado por Menu.mostraMenu())
+     */
+    public void executarOpcaoDoMenu(int opcao) {
+
+        switch (opcao) {
+
+            case 1:
+                iniciarPartida();
+                break;
+
+            case 2:
+                continuarPartida();
+                break;
+
+            case 3:
+                gerenciarSaves();
+                break;
+
+            case 4:
+                mostrarConquistas();
+                break;
+
+            case 5:
+                gerenciarConfiguracoes();
+                break;
+
+            case 6:
+                menu.mostraInstrucoes();
+                break;
+
+            case 7:
+                menu.mostraCreditos();
+                break;
+
+            case 8:
+                menu.mostraSaida();
+                break;
+
+        }
     }
 
     /**

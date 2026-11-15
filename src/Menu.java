@@ -77,10 +77,32 @@ public class Menu implements EventListener<EventoDialogoDisponivel> {
      * créditos e sair) são fluxo do jogo e ficam com o Controlador.
      */
     public void executarOpcaoDoMenu(int opcao) {
-        if (opcao == 1) {
-            iniciarPartida();
-        } else {
-            controlador.executarOpcaoDoMenu(opcao);
+        switch (opcao) {
+
+            case 1:
+                iniciarPartida();
+                break;
+            case 2:
+                controlador.continuarPartida();
+                break;
+            case 3:
+                controlador.gerenciarSaves();
+                break;
+            case 4:
+                controlador.mostrarConquistas();
+                break;
+            case 5:
+                controlador.gerenciarConfiguracoes();
+                break;
+            case 6:
+                eventBus.publish(new EventoTelaSolicitada(EventoTelaSolicitada.Tela.INSTRUCOES));
+                break;
+            case 7:
+                eventBus.publish(new EventoTelaSolicitada(EventoTelaSolicitada.Tela.CREDITOS));
+                break;
+            case 8:
+                eventBus.publish(new EventoTelaSolicitada(EventoTelaSolicitada.Tela.SAIDA));
+                break;
         }
     }
 
@@ -515,10 +537,13 @@ Luis Felipe Batista
      * Cria o protagonista e o estado inicial da partida e depois executa a história
      */
     public void iniciarPartida() {
+        Protagonista favorito = controlador.perguntaUsarFavorito();
         String nome = recebeNome();
         int idade = recebeIdade();
         String genero = recebeGenero();
-        Protagonista protagonista = controlador.criarProtagonista(nome,idade,genero);
+        Protagonista protagonista = controlador.criarProtagonista(nome,idade,genero,favorito);
         controlador.executarHistoria(EstadoPartida.nova(protagonista));
     }
+
+
 }

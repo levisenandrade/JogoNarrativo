@@ -1,7 +1,7 @@
 /**
  * classe que controla o fluxo da execução do jogo
  *
- * faz a ponte entre o jogador (Menu), o estado da partida (EstadoPartida) e a persistência
+ * faz a ponte entre o jogador (por meio do EventBus), o estado da partida (EstadoPartida) e a persistência
  * (RepositorioDeSaves): inicia/continua/carrega partidas, executa as cenas de cada ato e
  * oferece os pontos de salvamento. As regras do jogo (requisitos, efeitos) ficam no Model.
  */
@@ -18,10 +18,14 @@ public class Controlador {
     // na lista de saves do menu, a opção 4 representa o salvamento automático (slot 0)
     private static final int OPCAO_DO_SAVE_AUTOMATICO = RepositorioDeSaves.ULTIMO_SLOT_MANUAL + 1;
 
-    private final Menu menu;
     private final RepositorioDeSaves repositorio;
     private final RepositorioDeProgresso repositorioDeProgresso;
     private final RepositorioDeConfiguracoes repositorioDeConfiguracoes;
+
+    private final EventBus eventBus;
+
+    // última escolha publicada pela View (EventoEscolhaSelecionada)
+    private Escolha escolhaRecebida;
 
     // preferências do jogador: valem para o jogo todo e são mantidas entre as execuções
     private Configuracoes configuracoes;
@@ -31,21 +35,78 @@ public class Controlador {
 
     /**
      * o Controlador não cria suas dependências: quem monta as peças do jogo é a classe Partida
-     * (e os testes), o que também permite trocar o Menu ou o local dos saves sem mexer aqui
+     * (e os testes), o que também permite trocar a View ou o local dos saves sem mexer aqui
      *
-     * @param menu tela (entrada e saída de dados) usada para falar com o jogador
+     * @param eventBus canal usado para falar com o jogador: o Controlador publica eventos e a View reage
      * @param repositorio local de armazenamento dos saves
      * @param repositorioDeProgresso local de armazenamento dos finais alcançados e das conquistas
      * @param repositorioDeConfiguracoes local de armazenamento das preferências do jogador
      */
-    public Controlador(Menu menu, RepositorioDeSaves repositorio, RepositorioDeProgresso repositorioDeProgresso,
+    public Controlador(EventBus eventBus, RepositorioDeSaves repositorio, RepositorioDeProgresso repositorioDeProgresso,
                        RepositorioDeConfiguracoes repositorioDeConfiguracoes) {
-        this.menu = menu;
+        this.eventBus = eventBus;
         this.repositorio = repositorio;
         this.repositorioDeProgresso = repositorioDeProgresso;
         this.repositorioDeConfiguracoes = repositorioDeConfiguracoes;
         this.progresso = new ProgressoGlobal();
         this.configuracoes = new Configuracoes();
+        this.escolhaRecebida = null;
+    }
+
+    // ------------------------------------------------ comunicação com a View (EventBus)
+
+    /**
+     * liga ao EventBus o que o Controlador escuta; chamar uma vez, na montagem do jogo
+     */
+    public void registrarListeners() {
+        eventBus.subscribe(EventoEscolhaSelecionada.class, new EscolhaSelecionadaListener(this));
+    }
+
+    /**
+     * chamado pelo EscolhaSelecionadaListener: guarda a escolha que a View publicou
+     * (null quando o diálogo não tinha opções). A decisão do que fazer com ela
+     * continua em executaCena.
+     */
+    public void processarEscolha(Escolha escolha, Dialogo origem) {
+        this.escolhaRecebida = escolha;
+    }
+
+    private void exibirTexto(String texto) {
+        eventBus.publish(new EventoTextoDisponivel(texto));
+    }
+
+    private boolean confirmar(String pergunta) {
+        return solicitar(new EventoConfirmacaoSolicitada(pergunta));
+    }
+
+    /**
+     * publica um pedido e devolve a resposta da View
+     *
+     * Só funciona quando o Controlador roda fora de um listener (o EventBus entrega na hora).
+     * Dentro de um listener o pedido ficaria na fila e a resposta ainda não existiria.
+     */
+    private <R> R solicitar(EventoRequisicao<R> pedido) {
+        eventBus.publish(pedido);
+
+        if (!pedido.foiRespondido()) {
+            throw new IllegalStateException("Nenhuma View respondeu ao pedido publicado no EventBus.");
+        }
+
+        return pedido.getResposta();
+    }
+
+    /**
+     * publica um evento que a View responde com EventoEscolhaSelecionada e devolve essa escolha
+     */
+    private Escolha pedirEscolha(Evento pedido) {
+        escolhaRecebida = null;
+        eventBus.publish(pedido);
+
+        if (escolhaRecebida == null) {
+            throw new IllegalStateException("A View não publicou nenhuma escolha.");
+        }
+
+        return escolhaRecebida;
     }
 
     /**
@@ -60,41 +121,19 @@ public class Controlador {
     }
 
     /**
-     * mostra e controla o menu principal do jogo
-     *
-     * aqui o jogador pode iniciar uma partida, continuar ou carregar uma partida salva,
-     * ver as conquistas, mudar as configurações, ver as instruções, ver os créditos ou sair do jogo
-     */
-    public void menuInicial() {
-
-        inicializar();
-
-        int opcao;
-
-        do {
-            menu.mostraMenu();
-
-            opcao = menu.validaOpcao();
-
-            executarOpcaoDoMenu(opcao);
-
-        } while (opcao != 8);
-    }
-
-    /**
      * executa a ação correspondente a uma opção do menu principal
      *
      * é usado pelo menuInicial() (versão de terminal, com o número digitado) e pode ser usado
      * pela versão gráfica, em que cada botão chama este método com o número da sua opção
      *
-     * @param opcao número da opção (1 a 8, o mesmo mostrado por Menu.mostraMenu())
+     * @param opcao número da opção (1 a 8, o mesmo mostrado no menu principal)
      */
     public void executarOpcaoDoMenu(int opcao) {
 
         switch (opcao) {
 
             case 1:
-                iniciarPartida();
+
                 break;
 
             case 2:
@@ -114,29 +153,18 @@ public class Controlador {
                 break;
 
             case 6:
-                menu.mostraInstrucoes();
+                eventBus.publish(new EventoTelaSolicitada(EventoTelaSolicitada.Tela.INSTRUCOES));
                 break;
 
             case 7:
-                menu.mostraCreditos();
+                eventBus.publish(new EventoTelaSolicitada(EventoTelaSolicitada.Tela.CREDITOS));
                 break;
 
             case 8:
-                menu.mostraSaida();
+                eventBus.publish(new EventoTelaSolicitada(EventoTelaSolicitada.Tela.SAIDA));
                 break;
 
         }
-    }
-
-    /**
-     * inicia uma nova partida
-     *
-     * Cria o protagonista e o estado inicial da partida e depois executa a história
-     */
-    public void iniciarPartida() {
-        Protagonista protagonista = criarProtagonista();
-
-        executarHistoria(EstadoPartida.nova(protagonista));
     }
 
     /**
@@ -148,16 +176,13 @@ public class Controlador {
      *
      * @return o protagonista criado ou escolhido para a partida
      */
-    private Protagonista criarProtagonista() {
+    public Protagonista criarProtagonista(String nome,int idade, String genero) {
         Protagonista favorito = perguntaUsarFavorito();
 
         if (favorito != null) {
             return favorito;
         }
 
-        String nome = menu.recebeNome();
-        int idade = menu.recebeIdade();
-        String genero = menu.recebeGenero();
         Protagonista protagonista = new Protagonista(nome, idade, genero);
         protagonista.cadastrarItens();
 
@@ -180,7 +205,7 @@ public class Controlador {
 
         String descricao = favorito.getNome() + ", " + favorito.getIdade() + " anos, " + favorito.getGenero();
 
-        if (!menu.confirma("Deseja usar seu personagem favorito (" + descricao + ") nesta nova partida?")) {
+        if (!confirmar("Deseja usar seu personagem favorito (" + descricao + ") nesta nova partida?")) {
             return null;
         }
 
@@ -198,12 +223,12 @@ public class Controlador {
      * @param protagonista personagem recém-criado
      */
     private void perguntaSalvarFavorito(Protagonista protagonista) {
-        if (!menu.confirma("Deseja salvar este personagem como favorito?")) {
+        if (!confirmar("Deseja salvar este personagem como favorito?")) {
             return;
         }
 
         if (configuracoes.temPersonagemFavorito()
-                && !menu.confirma("Já existe um favorito salvo. Deseja substituí-lo?")) {
+                && !confirmar("Já existe um favorito salvo. Deseja substituí-lo?")) {
             return;
         }
 
@@ -211,7 +236,7 @@ public class Controlador {
                 protagonista.getNome(), protagonista.getIdade(), protagonista.getGenero()));
 
         if (salvarConfiguracoes()) {
-            menu.mostraString("Personagem salvo como favorito.");
+            exibirTexto("Personagem salvo como favorito.");
         }
     }
 
@@ -224,12 +249,12 @@ public class Controlador {
         try {
             configuracoes = repositorioDeConfiguracoes.carregar();
         } catch (CarregamentoException e) {
-            menu.mostraString("Aviso: não foi possível carregar suas configurações (" + e.getMessage()
+            exibirTexto("Aviso: não foi possível carregar suas configurações (" + e.getMessage()
                     + "). Serão usados os valores padrão.");
             configuracoes = new Configuracoes();
         }
 
-        menu.setPausaEntreDialogos(configuracoes.isPausaEntreDialogos());
+        eventBus.publish(new EventoConfiguracoesAtualizadas(configuracoes));
     }
 
     /**
@@ -242,7 +267,7 @@ public class Controlador {
             repositorioDeConfiguracoes.salvar(configuracoes);
             return true;
         } catch (SaveException e) {
-            menu.mostraString("Aviso: não foi possível salvar as configurações. " + e.getMessage());
+            exibirTexto("Aviso: não foi possível salvar as configurações. " + e.getMessage());
             return false;
         }
     }
@@ -254,14 +279,14 @@ public class Controlador {
         int opcao;
 
         do {
-            opcao = menu.mostraConfiguracoes(configuracoes);
+            opcao = solicitar(new EventoConfiguracoesSolicitadas(configuracoes));
 
             if (opcao == 1) {
                 configuracoes.setMostrarEfeitosDasEscolhas(!configuracoes.isMostrarEfeitosDasEscolhas());
                 salvarConfiguracoes();
             } else if (opcao == 2) {
                 configuracoes.setPausaEntreDialogos(!configuracoes.isPausaEntreDialogos());
-                menu.setPausaEntreDialogos(configuracoes.isPausaEntreDialogos());
+                eventBus.publish(new EventoConfiguracoesAtualizadas(configuracoes));
                 salvarConfiguracoes();
             } else if (opcao == 3) {
                 gerenciarFavorito();
@@ -271,18 +296,18 @@ public class Controlador {
 
     private void gerenciarFavorito() {
         if (!configuracoes.temPersonagemFavorito()) {
-            menu.mostraString("Você ainda não tem um personagem favorito. Crie um personagem em uma nova partida "
+            exibirTexto("Você ainda não tem um personagem favorito. Crie um personagem em uma nova partida "
                     + "e escolha salvá-lo como favorito.");
             return;
         }
 
         String nome = configuracoes.getPersonagemFavorito().getNome();
 
-        if (menu.confirma("Deseja excluir o personagem favorito " + nome + "?")) {
+        if (confirmar("Deseja excluir o personagem favorito " + nome + "?")) {
             configuracoes.setPersonagemFavorito(null);
 
             if (salvarConfiguracoes()) {
-                menu.mostraString("Personagem favorito excluído.");
+                exibirTexto("Personagem favorito excluído.");
             }
         }
     }
@@ -297,7 +322,7 @@ public class Controlador {
         try {
             progresso = repositorioDeProgresso.carregar();
         } catch (CarregamentoException e) {
-            menu.mostraString("Aviso: não foi possível carregar suas conquistas (" + e.getMessage()
+            exibirTexto("Aviso: não foi possível carregar suas conquistas (" + e.getMessage()
                     + "). O progresso começará vazio.");
             progresso = new ProgressoGlobal();
         }
@@ -307,7 +332,7 @@ public class Controlador {
         try {
             repositorioDeProgresso.salvar(progresso);
         } catch (SaveException e) {
-            menu.mostraString("Aviso: não foi possível salvar o progresso. " + e.getMessage());
+            exibirTexto("Aviso: não foi possível salvar o progresso. " + e.getMessage());
         }
     }
 
@@ -318,8 +343,7 @@ public class Controlador {
         int opcao;
 
         do {
-            menu.mostraConquistas(progresso);
-            opcao = menu.mostraOpcoesDasConquistas();
+            opcao = solicitar(new EventoConquistasSolicitadas(progresso));
 
             if (opcao == 1) {
                 redefinirConquistas();
@@ -328,13 +352,13 @@ public class Controlador {
     }
 
     private void redefinirConquistas() {
-        if (!menu.confirma("Deseja realmente apagar as conquistas e o registro de finais? Essa ação não pode ser desfeita.")) {
+        if (!confirmar("Deseja realmente apagar as conquistas e o registro de finais? Essa ação não pode ser desfeita.")) {
             return;
         }
 
         progresso = new ProgressoGlobal();
         salvarProgresso();
-        menu.mostraString("Conquistas redefinidas.");
+        exibirTexto("Conquistas redefinidas.");
     }
 
     /**
@@ -356,7 +380,7 @@ public class Controlador {
         }
 
         for (int i = 0; i < novas.size(); i++) {
-            menu.mostraConquistaDesbloqueada(novas.get(i));
+            eventBus.publish(new EventoConquistaDesbloqueada(novas.get(i)));
         }
     }
 
@@ -369,7 +393,7 @@ public class Controlador {
         int slot = slotMaisRecente();
 
         if (slot == -1) {
-            menu.mostraString("Não há partidas salvas para continuar.");
+            exibirTexto("Não há partidas salvas para continuar.");
             return;
         }
 
@@ -381,7 +405,7 @@ public class Controlador {
      */
     private void gerenciarSaves() {
         while (true) {
-            int opcao = menu.mostraListaDeSaves("CARREGAR PARTIDA", descricaoDosSlots(true));
+            int opcao = solicitar(new EventoListaDeSavesSolicitada("CARREGAR PARTIDA", descricaoDosSlots(true)));
 
             if (opcao == 0) {
                 return;
@@ -390,11 +414,11 @@ public class Controlador {
             int slot = (opcao == OPCAO_DO_SAVE_AUTOMATICO) ? RepositorioDeSaves.SLOT_AUTOMATICO : opcao;
 
             if (!repositorio.existe(slot)) {
-                menu.mostraString("Esse slot está vazio.");
+                exibirTexto("Esse slot está vazio.");
                 continue;
             }
 
-            int acao = menu.escolheAcaoDoSave();
+            int acao = solicitar(new EventoAcaoDoSaveSolicitada());
 
             if (acao == 1) {
                 carregarEExecutar(slot);
@@ -413,24 +437,24 @@ public class Controlador {
         try {
             estado = repositorio.carregar(slot);
         } catch (CarregamentoException e) {
-            menu.mostraString("Não foi possível carregar a partida: " + e.getMessage());
+            exibirTexto("Não foi possível carregar a partida: " + e.getMessage());
             return;
         }
 
-        menu.mostraString("Partida carregada.");
+        exibirTexto("Partida carregada.");
         executarHistoria(estado);
     }
 
     private void excluirComConfirmacao(int slot) {
-        if (!menu.confirma("Deseja realmente excluir esse save? Essa ação não pode ser desfeita.")) {
+        if (!confirmar("Deseja realmente excluir esse save? Essa ação não pode ser desfeita.")) {
             return;
         }
 
         try {
             repositorio.excluir(slot);
-            menu.mostraString("Save excluído.");
+            exibirTexto("Save excluído.");
         } catch (SaveException e) {
-            menu.mostraString("Não foi possível excluir o save: " + e.getMessage());
+            exibirTexto("Não foi possível excluir o save: " + e.getMessage());
         }
     }
 
@@ -494,29 +518,29 @@ public class Controlador {
     private void salvarAutomaticamente(EstadoPartida estado) {
         try {
             repositorio.salvar(RepositorioDeSaves.SLOT_AUTOMATICO, estado);
-            menu.mostraString("[Progresso salvo automaticamente]");
+            exibirTexto("[Progresso salvo automaticamente]");
         } catch (SaveException e) {
-            menu.mostraString("Aviso: não foi possível salvar automaticamente. " + e.getMessage());
+            exibirTexto("Aviso: não foi possível salvar automaticamente. " + e.getMessage());
         }
     }
 
     private void salvarManualmente(EstadoPartida estado) {
-        int slot = menu.mostraListaDeSaves("SALVAR PARTIDA", descricaoDosSlots(false));
+        int slot = solicitar(new EventoListaDeSavesSolicitada("SALVAR PARTIDA", descricaoDosSlots(false)));
 
         if (slot == 0) {
             return;
         }
 
         if (repositorio.existe(slot)
-                && !menu.confirma("O slot " + slot + " já possui um save. Deseja sobrescrever?")) {
+                && !confirmar("O slot " + slot + " já possui um save. Deseja sobrescrever?")) {
             return;
         }
 
         try {
             repositorio.salvar(slot, estado);
-            menu.mostraString("Partida salva no slot " + slot + ".");
+            exibirTexto("Partida salva no slot " + slot + ".");
         } catch (SaveException e) {
-            menu.mostraString("Não foi possível salvar a partida: " + e.getMessage());
+            exibirTexto("Não foi possível salvar a partida: " + e.getMessage());
         }
     }
 
@@ -529,7 +553,7 @@ public class Controlador {
         salvarAutomaticamente(estado);
 
         while (true) {
-            int opcao = menu.mostraPontoDeSalvamento(estado.getAto().getRotulo());
+            int opcao = solicitar(new EventoPontoDeSalvamentoSolicitado(estado.getAto().getRotulo()));
 
             if (opcao == 1) {
                 return true;
@@ -537,7 +561,7 @@ public class Controlador {
 
             if (opcao == 2) {
                 salvarManualmente(estado);
-            } else if (menu.confirma("Voltar ao menu principal? Você poderá retomar daqui pelo salvamento automático.")) {
+            } else if (confirmar("Voltar ao menu principal? Você poderá retomar daqui pelo salvamento automático.")) {
                 return false;
             }
         }
@@ -551,18 +575,18 @@ public class Controlador {
      * se alguma cena não puder ser carregada (arquivo JSON ausente ou inválido), mostra o erro e
      * volta ao menu principal
      */
-    private void executarHistoria(EstadoPartida estado) {
+    public void executarHistoria(EstadoPartida estado) {
         try {
             rodarHistoria(estado);
         } catch (CenaInvalidaException e) {
-            menu.mostraString("Erro ao carregar a história: " + e.getMessage());
+            exibirTexto("Erro ao carregar a história: " + e.getMessage());
         }
     }
 
     /**
      * em cada ato, entrega as cenas, executa e decide o próximo ato de acordo com as escolhas
      */
-    private void rodarHistoria(EstadoPartida estado) throws CenaInvalidaException {
+    public void rodarHistoria(EstadoPartida estado) throws CenaInvalidaException {
         ConstrutorDeCenas construtor = new ConstrutorDeCenas(estado);
 
         while (estado.getAto() != Ato.FIM) {
@@ -728,22 +752,25 @@ public class Controlador {
                 continue;
             }
 
-            // Mostra o diálogo e captura a escolha (0 se não houver opções)
-            int escolha = menu.mostraDialogo(dialogo);
-
-            if (dialogo.possuiOpcoes()) {
-                Escolha escolhaSelecionada = dialogo.getEscolha(escolha);
+            if (!dialogo.possuiOpcoes()) {
+                // sem opções: a View apenas exibe o diálogo
+                eventBus.publish(new EventoDialogoDisponivel(dialogo));
+            } else {
+                // com opções: a View exibe e responde com EventoEscolhaSelecionada
+                Escolha escolhaSelecionada = pedirEscolha(new EventoDialogoDisponivel(dialogo));
                 String motivo = estado.motivoDeBloqueio(escolhaSelecionada);
 
                 while (motivo != null) {
-                    menu.mostraString(motivo);
-                    escolha = menu.validaOpcao(dialogo.getQuantidadeEscolhas()); // pede nova escolha
-                    escolhaSelecionada = dialogo.getEscolha(escolha);
+                    // a View mostra o motivo e pede uma nova escolha
+                    escolhaSelecionada = pedirEscolha(new EventoEscolhaBloqueada(dialogo, motivo));
                     motivo = estado.motivoDeBloqueio(escolhaSelecionada);
                 }
 
+                // número da escolha, o mesmo mostrado ao jogador (começa em 1)
+                int escolha = dialogo.getListaEscolhas().indexOf(escolhaSelecionada) + 1;
+
                 if (escolhaSelecionada.getTextoConsequencia() != null) {
-                    menu.mostraString(escolhaSelecionada.getTextoConsequencia());
+                    exibirTexto(escolhaSelecionada.getTextoConsequencia());
                 }
 
                 estado.registrarDecisao(estado.getAto().name() + "#" + (i + 1) + "=" + escolha);
@@ -775,6 +802,8 @@ public class Controlador {
 
         return ultimaEscolha;
     }
+
+
 
     // ------------------------------------------- mostrar os efeitos das escolhas
 
@@ -831,9 +860,9 @@ public class Controlador {
         int variacao = depois - antes;
 
         if (variacao > 0) {
-            menu.mostraString("[" + nome + " +" + variacao + "]");
+            exibirTexto("[" + nome + " +" + variacao + "]");
         } else if (variacao < 0) {
-            menu.mostraString("[" + nome + " " + variacao + "]");
+            exibirTexto("[" + nome + " " + variacao + "]");
         }
     }
 }

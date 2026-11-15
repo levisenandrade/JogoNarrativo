@@ -4,6 +4,10 @@
  * faz a ponte entre o jogador (por meio do EventBus), o estado da partida (EstadoPartida) e a persistência
  * (RepositorioDeSaves): inicia/continua/carrega partidas, executa as cenas de cada ato e
  * oferece os pontos de salvamento. As regras do jogo (requisitos, efeitos) ficam no Model.
+ *
+ * O loop do menu principal e a escolha de qual ação chamar ficam na View (Menu): o Controlador
+ * só expõe as ações (continuarPartida, gerenciarSaves, mostrarConquistas, gerenciarConfiguracoes,
+ * criarProtagonista, executarHistoria) e conversa com a View pelo EventBus.
  */
 
 import java.time.LocalDateTime;
@@ -80,19 +84,10 @@ public class Controlador {
     }
 
     /**
-     * publica um pedido e devolve a resposta da View
-     *
-     * Só funciona quando o Controlador roda fora de um listener (o EventBus entrega na hora).
-     * Dentro de um listener o pedido ficaria na fila e a resposta ainda não existiria.
+     * publica um pedido e devolve a resposta da View (entrega imediata, ver EventBus.request)
      */
     private <R> R solicitar(EventoRequisicao<R> pedido) {
-        eventBus.publish(pedido);
-
-        if (!pedido.foiRespondido()) {
-            throw new IllegalStateException("Nenhuma View respondeu ao pedido publicado no EventBus.");
-        }
-
-        return pedido.getResposta();
+        return eventBus.request(pedido);
     }
 
     /**
@@ -121,53 +116,6 @@ public class Controlador {
     }
 
     /**
-     * executa a ação correspondente a uma opção do menu principal
-     *
-     * é usado pelo menuInicial() (versão de terminal, com o número digitado) e pode ser usado
-     * pela versão gráfica, em que cada botão chama este método com o número da sua opção
-     *
-     * @param opcao número da opção (1 a 8, o mesmo mostrado no menu principal)
-     */
-    public void executarOpcaoDoMenu(int opcao) {
-
-        switch (opcao) {
-
-            case 1:
-
-                break;
-
-            case 2:
-                continuarPartida();
-                break;
-
-            case 3:
-                gerenciarSaves();
-                break;
-
-            case 4:
-                mostrarConquistas();
-                break;
-
-            case 5:
-                gerenciarConfiguracoes();
-                break;
-
-            case 6:
-                eventBus.publish(new EventoTelaSolicitada(EventoTelaSolicitada.Tela.INSTRUCOES));
-                break;
-
-            case 7:
-                eventBus.publish(new EventoTelaSolicitada(EventoTelaSolicitada.Tela.CREDITOS));
-                break;
-
-            case 8:
-                eventBus.publish(new EventoTelaSolicitada(EventoTelaSolicitada.Tela.SAIDA));
-                break;
-
-        }
-    }
-
-    /**
      * obtém o protagonista da nova partida
      *
      * Primeiro oferece o personagem favorito, se existir. Se o jogador recusar (ou não houver favorito),
@@ -176,9 +124,7 @@ public class Controlador {
      *
      * @return o protagonista criado ou escolhido para a partida
      */
-    public Protagonista criarProtagonista(String nome,int idade, String genero) {
-        Protagonista favorito = perguntaUsarFavorito();
-
+    public Protagonista criarProtagonista(String nome,int idade, String genero,Protagonista favorito) {
         if (favorito != null) {
             return favorito;
         }
@@ -196,7 +142,7 @@ public class Controlador {
      *
      * @return o protagonista criado a partir do favorito, ou null se não há favorito ou o jogador recusou
      */
-    private Protagonista perguntaUsarFavorito() {
+    public Protagonista perguntaUsarFavorito() {
         PersonagemFavorito favorito = configuracoes.getPersonagemFavorito();
 
         if (favorito == null) {
@@ -275,7 +221,7 @@ public class Controlador {
     /**
      * tela de configurações do menu principal: liga/desliga as opções e gerencia o personagem favorito
      */
-    private void gerenciarConfiguracoes() {
+    public void gerenciarConfiguracoes() {
         int opcao;
 
         do {
@@ -339,7 +285,7 @@ public class Controlador {
     /**
      * tela de conquistas do menu principal: mostra as conquistas e permite redefini-las
      */
-    private void mostrarConquistas() {
+    public void mostrarConquistas() {
         int opcao;
 
         do {
@@ -389,7 +335,7 @@ public class Controlador {
     /**
      * retoma a partida do save mais recente (entre os slots manuais e o automático)
      */
-    private void continuarPartida() {
+    public void continuarPartida() {
         int slot = slotMaisRecente();
 
         if (slot == -1) {
@@ -403,7 +349,7 @@ public class Controlador {
     /**
      * tela de saves do menu principal: lista os slots e permite carregar ou excluir
      */
-    private void gerenciarSaves() {
+    public void gerenciarSaves() {
         while (true) {
             int opcao = solicitar(new EventoListaDeSavesSolicitada("CARREGAR PARTIDA", descricaoDosSlots(true)));
 

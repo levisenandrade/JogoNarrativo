@@ -6,19 +6,26 @@ import javafx.stage.Stage;
 
 /**
  * Aplicação JavaFX. Monta as mesmas peças que a Partida monta,
- * mas em vez de chamar controlador.menuInicial() (loop de terminal), abre a janela.
+ * mas em vez de chamar menu.menuInicial() (loop de terminal), abre a janela.
  */
 public class App extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
         // 1. mesma montagem da Partida (Model e Controlador não mudam)
+        EventBus eventBus = new EventBus();
+
+        // View de terminal: continua respondendo aos eventos que a tela JavaFX ainda não trata.
+        // Precisa estar registrada antes de o Controlador publicar o primeiro evento.
         Entrada entrada = new Entrada();
-        Menu menu = new Menu(entrada); // View de terminal: ainda usada pelo Controlador nas partes não migradas
+        Menu menu = new Menu(entrada, eventBus);
+        menu.registrarNoBus();
+
         RepositorioDeSaves repositorio = new RepositorioJson();
         RepositorioDeProgresso repositorioDeProgresso = new RepositorioDeProgresso();
         RepositorioDeConfiguracoes repositorioDeConfiguracoes = new RepositorioDeConfiguracoes();
-        Controlador controlador = new Controlador(menu, repositorio, repositorioDeProgresso, repositorioDeConfiguracoes);
+        Controlador controlador = new Controlador(eventBus, repositorio, repositorioDeProgresso, repositorioDeConfiguracoes);
+        controlador.registrarListeners();
 
         // 2. carrega configurações e progresso (o que o menuInicial() fazia antes do loop)
         controlador.inicializar();

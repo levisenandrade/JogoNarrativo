@@ -4,17 +4,106 @@
  * ela faz uso da classe Entrada para receber os dados do usuário e também apresenta
  * informações, instruções, créditos no menu inicial, sáida e tambem os  diálogos
  * ao longo do jogo
+ *
+ * é a View do MVC: não decide a narrativa. Ela reage a eventos publicados pelo Controlador
+ * no EventBus (exibe, coleta a entrada) e, quando preciso, publica a resposta do jogador
  */
 
-public class Menu {
+public class Menu implements EventListener<EventoDialogoDisponivel> {
 
     public static final int OPCOES_MENU_PRINCIPAL = 8;
 
     private Entrada entrada;
+    private EventBus eventBus;
     private boolean pausaEntreDialogos;   // preferência: esperar ENTER entre os diálogos
+    private Controlador controlador;
 
-    public Menu(Entrada entrada) {
+    public Menu(Entrada entrada, EventBus eventBus) {
         this.entrada = entrada;
+        this.eventBus = eventBus;
+    }
+
+    public void setControlador(Controlador controlador) {
+        this.controlador = controlador;
+    }
+
+    /**
+     * liga o Menu aos eventos que ele sabe mostrar; chamar uma vez, antes de menuInicial()
+     *
+     * O Menu implementa EventListener só para EventoDialogoDisponivel (Java não permite a mesma
+     * interface com tipos diferentes), então os outros eventos entram por referência de método.
+     */
+    public void registrarNoBus() {
+        eventBus.subscribe(EventoDialogoDisponivel.class,           this);
+        eventBus.subscribe(EventoEscolhaBloqueada.class,            this::aoEscolhaBloqueada);
+        eventBus.subscribe(EventoTextoDisponivel.class,             this::aoTextoDisponivel);
+        eventBus.subscribe(EventoConfirmacaoSolicitada.class,       this::aoConfirmacaoSolicitada);
+        eventBus.subscribe(EventoConfiguracoesSolicitadas.class,    this::aoConfiguracoesSolicitadas);
+        eventBus.subscribe(EventoConfiguracoesAtualizadas.class,    this::aoConfiguracoesAtualizadas);
+        eventBus.subscribe(EventoConquistasSolicitadas.class,       this::aoConquistasSolicitadas);
+        eventBus.subscribe(EventoConquistaDesbloqueada.class,       this::aoConquistaDesbloqueada);
+        eventBus.subscribe(EventoListaDeSavesSolicitada.class,      this::aoListaDeSavesSolicitada);
+        eventBus.subscribe(EventoAcaoDoSaveSolicitada.class,        this::aoAcaoDoSaveSolicitada);
+        eventBus.subscribe(EventoPontoDeSalvamentoSolicitado.class, this::aoPontoDeSalvamentoSolicitado);
+        eventBus.subscribe(EventoTelaSolicitada.class,              this::aoTelaSolicitada);
+    }
+
+    /**
+     * mostra e controla o menu principal do jogo
+     *
+     * aqui o jogador pode iniciar uma partida, continuar ou carregar uma partida salva,
+     * ver as conquistas, mudar as configurações, ver as instruções, ver os créditos ou sair do jogo
+     */
+    public void menuInicial() {
+
+        controlador.inicializar();
+
+        int opcao;
+
+        do {
+            mostraMenu();
+
+            opcao = validaOpcao();
+
+            executarOpcaoDoMenu(opcao);
+
+        } while (opcao != 8);
+    }
+    /**
+     * executa a opção escolhida no menu principal
+     *
+     * "Nova partida" começa pela coleta dos dados do protagonista, que é entrada de dados e por
+     * isso fica aqui. As demais opções (continuar, saves, conquistas, configurações, instruções,
+     * créditos e sair) são fluxo do jogo e ficam com o Controlador.
+     */
+    public void executarOpcaoDoMenu(int opcao) {
+        switch (opcao) {
+
+            case 1:
+                iniciarPartida();
+                break;
+            case 2:
+                controlador.continuarPartida();
+                break;
+            case 3:
+                controlador.gerenciarSaves();
+                break;
+            case 4:
+                controlador.mostrarConquistas();
+                break;
+            case 5:
+                controlador.gerenciarConfiguracoes();
+                break;
+            case 6:
+                eventBus.publish(new EventoTelaSolicitada(EventoTelaSolicitada.Tela.INSTRUCOES));
+                break;
+            case 7:
+                eventBus.publish(new EventoTelaSolicitada(EventoTelaSolicitada.Tela.CREDITOS));
+                break;
+            case 8:
+                eventBus.publish(new EventoTelaSolicitada(EventoTelaSolicitada.Tela.SAIDA));
+                break;
+        }
     }
 
     public String recebeNome() {
@@ -77,7 +166,7 @@ public class Menu {
     }
 
     /**
-     * Sobrecarga para o menu principal, que tem 6 opções fixas.
+     * Sobrecarga para o menu principal, que tem OPCOES_MENU_PRINCIPAL opções fixas.
      */
     public int validaOpcao() {
         return validaOpcao(OPCOES_MENU_PRINCIPAL);
@@ -373,4 +462,88 @@ Luis Felipe Batista
     public void mostraString(String texto) {
         System.out.println(texto);
     }
+
+    // ---------------------------------------------------------------- eventos (EventBus)
+
+    /**
+     * reação ao EventoDialogoDisponivel: exibe o diálogo, coleta a escolha e a publica.
+     * O Menu não decide qual é o próximo diálogo nem a próxima cena.
+     */
+    public void onEvent(EventoDialogoDisponivel evento) {
+        Dialogo dialogo = evento.getDialogo();
+        int opcao = mostraDialogo(dialogo);            // 0 quando o diálogo não tem opções1
+        Escolha escolhida = dialogo.getEscolha(opcao);  // null quando opcao == 0
+
+        eventBus.publish(new EventoEscolhaSelecionada(escolhida, dialogo));
+    }
+
+    private void aoEscolhaBloqueada(EventoEscolhaBloqueada evento) {
+        Dialogo dialogo = evento.getDialogo();
+
+        mostraString(evento.getMotivo());
+        int opcao = validaOpcao(dialogo.getQuantidadeEscolhas());
+
+        eventBus.publish(new EventoEscolhaSelecionada(dialogo.getEscolha(opcao), dialogo));
+    }
+
+    private void aoTextoDisponivel(EventoTextoDisponivel evento) {
+        mostraString(evento.getTexto());
+    }
+
+    private void aoConfirmacaoSolicitada(EventoConfirmacaoSolicitada evento) {
+        evento.responder(confirma(evento.getPergunta()));
+    }
+
+    private void aoConfiguracoesSolicitadas(EventoConfiguracoesSolicitadas evento) {
+        evento.responder(mostraConfiguracoes(evento.getConfiguracoes()));
+    }
+
+    private void aoConfiguracoesAtualizadas(EventoConfiguracoesAtualizadas evento) {
+        setPausaEntreDialogos(evento.getConfiguracoes().isPausaEntreDialogos());
+    }
+
+    private void aoConquistasSolicitadas(EventoConquistasSolicitadas evento) {
+        mostraConquistas(evento.getProgresso());
+        evento.responder(mostraOpcoesDasConquistas());
+    }
+
+    private void aoConquistaDesbloqueada(EventoConquistaDesbloqueada evento) {
+        mostraConquistaDesbloqueada(evento.getConquista());
+    }
+
+    private void aoListaDeSavesSolicitada(EventoListaDeSavesSolicitada evento) {
+        evento.responder(mostraListaDeSaves(evento.getTitulo(), evento.getLinhas()));
+    }
+
+    private void aoAcaoDoSaveSolicitada(EventoAcaoDoSaveSolicitada evento) {
+        evento.responder(escolheAcaoDoSave());
+    }
+
+    private void aoPontoDeSalvamentoSolicitado(EventoPontoDeSalvamentoSolicitado evento) {
+        evento.responder(mostraPontoDeSalvamento(evento.getRotuloDoAto()));
+    }
+
+    private void aoTelaSolicitada(EventoTelaSolicitada evento) {
+        switch (evento.getTela()) {
+            case INSTRUCOES: mostraInstrucoes(); break;
+            case CREDITOS:   mostraCreditos();   break;
+            case SAIDA:      mostraSaida();      break;
+        }
+    }
+
+    /**
+     * inicia uma nova partida
+     *
+     * Cria o protagonista e o estado inicial da partida e depois executa a história
+     */
+    public void iniciarPartida() {
+        Protagonista favorito = controlador.perguntaUsarFavorito();
+        String nome = recebeNome();
+        int idade = recebeIdade();
+        String genero = recebeGenero();
+        Protagonista protagonista = controlador.criarProtagonista(nome,idade,genero,favorito);
+        controlador.executarHistoria(EstadoPartida.nova(protagonista));
+    }
+
+
 }

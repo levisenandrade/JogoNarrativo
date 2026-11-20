@@ -63,6 +63,27 @@ public class EventBus {
         }
     }
 
+    /**
+     * Publica um pedido e devolve a resposta dada pela View.
+     * A entrega é imediata (não passa pela fila), porque o Controlador precisa da
+     * resposta para continuar o que estava fazendo.
+     *
+     * @throws IllegalStateException se nenhuma View respondeu ao pedido
+     */
+    public <R> R request(EventoRequisicao<R> pedido) {
+        if (pedido == null) {
+            throw new IllegalArgumentException("pedido não pode ser nulo");
+        }
+
+        despachar(pedido);
+
+        if (!pedido.foiRespondido()) {
+            throw new IllegalStateException("Nenhuma View respondeu ao pedido: " + pedido.getClass().getSimpleName());
+        }
+
+        return pedido.getResposta();
+    }
+
     private void despachar(Evento evento) {
         List<Consumer<Evento>> inscritos = listeners.get(evento.getClass());
 

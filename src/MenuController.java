@@ -1,88 +1,65 @@
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 
-import java.io.IOException;
+/**
+ * Tela do menu inicial (menu.fxml). Só encaminha os cliques: abre telas pelo NavegadorDeTelas
+ * e pede ao Controlador tudo que é regra do jogo (saves, configurações, conquistas, partida).
+ */
+public class MenuController implements Tela {
 
-public class MenuController {
+    private NavegadorDeTelas navegador;
 
-    private Controlador controlador;
-
-    /** chamado pela App logo depois de carregar o FXML */
-    public void setControlador(Controlador controlador) {
-        this.controlador = controlador;
+    @Override
+    public void configurar(NavegadorDeTelas navegador) {
+        this.navegador = navegador;
     }
 
-    /** chamado automaticamente pelo JavaFX quando os componentes do FXML já foram criados */
     @FXML
-    private void initialize() {
-        System.out.println("Janela do menu carregada.");
+    private void aoIniciarOJogo() {
+        Controlador controlador = navegador.getControlador();
+
+        // se houver personagem favorito, o Controlador pergunta (janela de confirmação) se quer usá-lo
+        Protagonista favorito = controlador.perguntaUsarFavorito();
+
+        if (favorito != null) {
+            controlador.executarHistoria(EstadoPartida.nova(favorito));
+        } else {
+            navegador.mostrarCriacao();
+        }
+    }
+
+    @FXML
+    private void aoContinuar() {
+        navegador.getControlador().continuarPartida();
+    }
+
+    @FXML
+    private void aoSaves() {
+        navegador.getControlador().gerenciarSaves();
+    }
+
+    @FXML
+    private void aoConquistas() {
+        navegador.getControlador().mostrarConquistas();
+    }
+
+    @FXML
+    private void aoConfiguracoes() {
+        navegador.getControlador().gerenciarConfiguracoes();
+    }
+
+    @FXML
+    private void aoMostrarCreditos() {
+        navegador.abrirJanela("/creditos.fxml", "Créditos", 650, 540);
+    }
+
+    @FXML
+    private void aoMostrarInstrucao() {
+        navegador.abrirJanela("/instrucoes.fxml", "Instruções", 780, 560);
     }
 
     @FXML
     private void aoApertarSair() {
         Platform.exit();
-    }
-
-    @FXML
-    private void aoMostrarCreditos() {
-        try {
-            FXMLLoader loader =
-                    new FXMLLoader(getClass().getResource("/creditos.fxml"));
-
-            Parent root = loader.load();
-
-            Stage stage = new Stage();
-            stage.setTitle("Créditos");
-            stage.setScene(new Scene(root, 600, 500));
-            stage.show();
-
-        } catch (IOException e) {
-            System.err.println("Erro ao carregar a tela de créditos.");
-            e.printStackTrace();
-        }
-    }
-    @FXML
-    private void aoMostrarInstrucao() {
-        try {
-            FXMLLoader loader =
-                    new FXMLLoader(getClass().getResource("/instrucoes.fxml"));
-
-            Parent root = loader.load();
-
-            Stage stage = new Stage();
-            stage.setTitle("Intruções");
-            stage.setScene(new Scene(root, 730, 500));
-            stage.show();
-
-        } catch (IOException e) {
-            System.err.println("Erro ao carregar a tela de instruções.");
-            e.printStackTrace();
-        }
-    }
-    @FXML
-    private void aoIniciarOJogo(ActionEvent event) {
-        try {
-            FXMLLoader loader =
-                    new FXMLLoader(getClass().getResource("/jogo.fxml"));
-
-            Parent root = loader.load();
-
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(root, 800, 600));
-            stage.setTitle("Jogo");
-
-        } catch (IOException e) {
-            System.err.println("Erro ao carregar a tela do jogo.");
-            e.printStackTrace();
-        }
     }
 }

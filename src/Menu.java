@@ -537,11 +537,16 @@ Luis Felipe Batista
      * Cria o protagonista e o estado inicial da partida e depois executa a história
      */
     public void iniciarPartida() {
-        Protagonista favorito = controlador.perguntaUsarFavorito();
-        String nome = recebeNome();
-        int idade = recebeIdade();
-        String genero = recebeGenero();
-        Protagonista protagonista = controlador.criarProtagonista(nome,idade,genero,favorito);
+        Protagonista protagonista = controlador.perguntaUsarFavorito();
+
+        // só pede os dados se o jogador não quis (ou não tem) o personagem favorito
+        if (protagonista == null) {
+            String nome = recebeNome();
+            int idade = recebeIdade();
+            String genero = recebeGenero();
+            protagonista = controlador.criarProtagonista(nome, idade, genero, null);
+        }
+
         controlador.executarHistoria(EstadoPartida.nova(protagonista));
     }
 

@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -6,61 +8,48 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
-<VBox alignment="TOP_CENTER" prefHeight="550.0" prefWidth="750.0" spacing="15" fx:controller="InstrucoesController">
-<padding>
-<Insets bottom="20" left="40" right="40" top="20"/>
-</padding>
-<Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="INSTRUÇÕES"/>
-<!--
- cada parágrafo é um TextFlow: é ele que permite o alinhamento justificado 
--->
-<ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
-<VBox spacing="12">
-<padding>
-<Insets bottom="5" left="5" right="15" top="5"/>
-</padding>
-<TextFlow textAlignment="JUSTIFY" lineSpacing="3">
-<Text text="Bem-vindo ao nosso jogo narrativo interativo! Você assumirá o papel do protagonista e deverá tomar decisões ao longo da história. Suas escolhas poderão alterar os acontecimentos, os relacionamentos com outros personagens, o acesso a determinadas cenas e até mesmo o final da história.">
-<font>
-</font>
-</Text>
-</TextFlow>
-<TextFlow textAlignment="JUSTIFY" lineSpacing="3">
-<Text text="Durante a aventura, fique atento às informações apresentadas e pense bem antes de escolher. Algumas consequências podem não ser percebidas imediatamente. O jogo é baseado em narrativa e escolhas: não existe apenas um caminho correto, e diferentes decisões podem levar a diferentes acontecimentos e finais.">
-<font>
-<Font size="14.0"/>
-</font>
-</Text>
-</TextFlow>
-<TextFlow textAlignment="JUSTIFY" lineSpacing="3">
-<Text text="O jogo salva automaticamente ao iniciar cada ato e, nesses mesmos pontos, você também pode salvar manualmente em um dos 3 slots. Use 'Continuar' ou 'Carregar partida' no menu para retomar.">
-<font>
-<Font size="14.0"/>
-</font>
-</Text>
-</TextFlow>
-<TextFlow textAlignment="JUSTIFY" lineSpacing="3">
-<Text text="Os finais que você alcançar e as conquistas que desbloquear ficam guardados entre as execuções do jogo. Consulte a seção 'Conquistas' para acompanhar seu progresso.">
-<font>
-<Font size="14.0"/>
-</font>
-</Text>
-</TextFlow>
-<TextFlow textAlignment="JUSTIFY" lineSpacing="3">
-<Text text="Em 'Configurações' você pode escolher se deseja visualizar alterações de atributos e relações após cada escolha, adicionar pausas entre diálogos e gerenciar seu personagem favorito.">
-<font>
-<Font size="14.0"/>
-</font>
-</Text>
-</TextFlow>
-<TextFlow textAlignment="CENTER" lineSpacing="3">
-<Text text="Boa sorte e boa história!">
-<font>
-<Font name="System Bold" size="14.0"/>
-</font>
-</Text>
-</TextFlow>
-</VBox>
-</ScrollPane>
-<Button mnemonicParsing="false" onAction="#aoVoltar" prefWidth="100.0" text="Voltar"/>
+
+<VBox alignment="TOP_CENTER" prefHeight="550.0" prefWidth="750.0" spacing="15" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="InstrucoesController">
+
+    <padding>
+        <Insets bottom="20" left="40" right="40" top="20" />
+    </padding>
+
+    <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="INSTRUÇÕES" />
+
+    <!-- cada parágrafo é um TextFlow: é ele que permite o alinhamento justificado -->
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+        <VBox spacing="12">
+            <padding>
+                <Insets bottom="5" left="5" right="15" top="5" />
+            </padding>
+
+            <TextFlow textAlignment="JUSTIFY" lineSpacing="3">
+                <Text text="Bem-vindo ao nosso jogo narrativo interativo! Você assumirá o papel do protagonista e deverá tomar decisões ao longo da história. Suas escolhas poderão alterar os acontecimentos, os relacionamentos com outros personagens, o acesso a determinadas cenas e até mesmo o final da história."><font><Font size="14.0" /></font></Text>
+            </TextFlow>
+
+            <TextFlow textAlignment="JUSTIFY" lineSpacing="3">
+                <Text text="Durante a aventura, fique atento às informações apresentadas e pense bem antes de escolher. Algumas consequências podem não ser percebidas imediatamente. O jogo é baseado em narrativa e escolhas: não existe apenas um caminho correto, e diferentes decisões podem levar a diferentes acontecimentos e finais."><font><Font size="14.0" /></font></Text>
+            </TextFlow>
+
+            <TextFlow textAlignment="JUSTIFY" lineSpacing="3">
+                <Text text="O jogo salva automaticamente ao iniciar cada ato e, nesses mesmos pontos, você também pode salvar manualmente em um dos 3 slots. Use 'Continuar' ou 'Carregar partida' no menu para retomar."><font><Font size="14.0" /></font></Text>
+            </TextFlow>
+
+            <TextFlow textAlignment="JUSTIFY" lineSpacing="3">
+                <Text text="Os finais que você alcançar e as conquistas que desbloquear ficam guardados entre as execuções do jogo. Consulte a seção 'Conquistas' para acompanhar seu progresso."><font><Font size="14.0" /></font></Text>
+            </TextFlow>
+
+            <TextFlow textAlignment="JUSTIFY" lineSpacing="3">
+                <Text text="Em 'Configurações' você pode escolher se deseja visualizar alterações de atributos e relações após cada escolha, adicionar pausas entre diálogos e gerenciar seu personagem favorito."><font><Font size="14.0" /></font></Text>
+            </TextFlow>
+
+            <TextFlow textAlignment="CENTER" lineSpacing="3">
+                <Text text="Boa sorte e boa história!"><font><Font name="System Bold" size="14.0" /></font></Text>
+            </TextFlow>
+        </VBox>
+    </ScrollPane>
+
+    <Button mnemonicParsing="false" onAction="#aoVoltar" prefWidth="100.0" text="Voltar" />
+
 </VBox>

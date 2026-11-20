@@ -46,7 +46,16 @@ public class ControladorTest {
         String roteiro = String.join("\n", linhas) + "\n";
         Entrada entrada = new Entrada(new ByteArrayInputStream(roteiro.getBytes(StandardCharsets.UTF_8)));
 
-        new Controlador(new Menu(entrada), repositorio, repositorioDeProgresso, repositorioDeConfiguracoes).menuInicial();
+        // mesma montagem da Partida: View e Controlador só se conhecem pelo EventBus
+        EventBus eventBus = new EventBus();
+        Menu menu = new Menu(entrada, eventBus);
+        menu.registrarNoBus();
+
+        Controlador controlador = new Controlador(eventBus, repositorio, repositorioDeProgresso, repositorioDeConfiguracoes);
+        controlador.registrarListeners();
+        menu.setControlador(controlador);
+
+        menu.menuInicial();
 
         return saidaCapturada.toString(StandardCharsets.UTF_8);
     }

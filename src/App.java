@@ -1,43 +1,32 @@
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
- * Aplicação JavaFX. Monta as mesmas peças que a Partida monta,
- * mas em vez de chamar menu.menuInicial() (loop de terminal), abre a janela.
+ * Aplicação JavaFX. Monta as mesmas peças que a Partida (terminal) monta, mas com a View gráfica
+ * no lugar do Menu: Model e Controlador não mudam.
  */
 public class App extends Application {
 
     @Override
-    public void start(Stage stage) throws Exception {
-        // 1. mesma montagem da Partida (Model e Controlador não mudam)
+    public void start(Stage stage) {
         EventBus eventBus = new EventBus();
 
-        // View de terminal: continua respondendo aos eventos que a tela JavaFX ainda não trata.
-        // Precisa estar registrada antes de o Controlador publicar o primeiro evento.
-        Entrada entrada = new Entrada();
-        Menu menu = new Menu(entrada, eventBus);
-        menu.registrarNoBus();
-
-        RepositorioDeSaves repositorio = new RepositorioJson();
-        RepositorioDeProgresso repositorioDeProgresso = new RepositorioDeProgresso();
-        RepositorioDeConfiguracoes repositorioDeConfiguracoes = new RepositorioDeConfiguracoes();
-        Controlador controlador = new Controlador(eventBus, repositorio, repositorioDeProgresso, repositorioDeConfiguracoes);
+        Controlador controlador = new Controlador(eventBus, new RepositorioJson(),
+                new RepositorioDeProgresso(), new RepositorioDeConfiguracoes());
         controlador.registrarListeners();
 
-        // 2. carrega configurações e progresso (o que o menuInicial() fazia antes do loop)
-        controlador.inicializar();
+        NavegadorDeTelas navegador = new NavegadorDeTelas(stage, controlador);
 
-        // 3. carrega a nova View (FXML) e entrega o Controlador ao controller da tela
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/menu.fxml"));
-        Parent raiz = loader.load();
-        MenuController menuController = loader.getController();
-        menuController.setControlador(controlador);
+        // a View precisa estar inscrita no bus antes de o Controlador publicar o primeiro evento
+        ViewFX view = new ViewFX(eventBus, navegador);
+        view.registrarNoBus();
 
-        stage.setTitle("Jogo Narrativo Interativo");
-        stage.setScene(new Scene(raiz, 800, 600));
+        controlador.inicializar(); // lê configurações e progresso gravados
+
+        // fechar a janela no meio da história encerra o programa (o salvamento automático já foi feito)
+        stage.setOnCloseRequest(evento -> System.exit(0));
+
+        navegador.mostrarMenu();
         stage.show();
     }
 }

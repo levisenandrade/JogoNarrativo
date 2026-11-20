@@ -522,10 +522,15 @@ public class Controlador {
      * volta ao menu principal
      */
     public void executarHistoria(EstadoPartida estado) {
+        eventBus.publish(new EventoPartidaIniciada(estado));
         try {
             rodarHistoria(estado);
         } catch (CenaInvalidaException e) {
             exibirTexto("Erro ao carregar a história: " + e.getMessage());
+        } catch (PartidaInterrompidaException e) {
+            // o jogador voltou ao menu no meio da história: não é erro, só encerra a partida
+        } finally {
+            eventBus.publish(new EventoPartidaEncerrada());
         }
     }
 
@@ -689,6 +694,7 @@ public class Controlador {
         }
 
         int ultimaEscolha = 0;
+        eventBus.publish(new EventoCenaIniciada(cena));
         List<Dialogo> dialogos = cena.getDialogos();
 
         for (int i = 0; i < dialogos.size(); i++) {
@@ -700,10 +706,10 @@ public class Controlador {
 
             if (!dialogo.possuiOpcoes()) {
                 // sem opções: a View apenas exibe o diálogo
-                eventBus.publish(new EventoDialogoDisponivel(dialogo));
+                eventBus.publish(new EventoDialogoDisponivel(dialogo, cena.getCenaId(), i + 1));
             } else {
                 // com opções: a View exibe e responde com EventoEscolhaSelecionada
-                Escolha escolhaSelecionada = pedirEscolha(new EventoDialogoDisponivel(dialogo));
+                Escolha escolhaSelecionada = pedirEscolha(new EventoDialogoDisponivel(dialogo, cena.getCenaId(), i + 1));
                 String motivo = estado.motivoDeBloqueio(escolhaSelecionada);
 
                 while (motivo != null) {

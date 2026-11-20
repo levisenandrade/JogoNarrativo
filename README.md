@@ -63,7 +63,11 @@ JSON é um formato textual leve e legível, adequado para representar o estado d
 
 ### 3.4. Padrões de projeto (GoF)
 
-[PREENCHER na Fase 3: descrever os 3 padrões GoF aplicados — nome, onde foi usado no código e qual problema resolveu. Ex.: *Singleton* para ..., *Factory Method* para ..., *Observer* para ...]
+Foram aplicados três padrões GoF:
+
+* **Observer** (`EventBus`, `EventListener`, `ViewFX`): o Controlador publica eventos (diálogo disponível, conquista desbloqueada, partida iniciada...) e a View se inscreve para reagir a eles. Assim o Controlador não conhece a View, e o mesmo Controlador funciona com o terminal (`Menu`) e com o JavaFX (`ViewFX`).
+* **Facade** (`NavegadorDeTelas`): esconde dos controllers das telas os detalhes do JavaFX (`FXMLLoader`, `Scene`, `Stage`). Para trocar de tela, basta chamar `mostrarMenu()`, `mostrarCriacao()`, `mostrarJogo()` ou `abrirJanela(...)`.
+* **Strategy** (`RepositorioDeSaves`, `RepositorioJson`, `RepositorioEmMemoria`): o Controlador depende só da interface `RepositorioDeSaves`; a forma de guardar os saves (arquivos JSON ou memória) pode ser trocada sem alterar o Controlador.
 
 ---
 
@@ -166,7 +170,13 @@ O registro de finais alimenta a opção **Conquistas** do menu: uma conquista po
 
 ### 5.9. Interface gráfica (Fase 3)
 
-[PREENCHER: telas implementadas em JavaFX (menu, cena, escolhas, saves, configurações, conquistas), como a View se comunica com o Controller e como o MVC foi preservado.]
+A interface usa JavaFX com telas em FXML: menu inicial, criação do protagonista, tela da narrativa (arte da cena, personagem, texto, opções, status e botão de voltar ao menu), créditos e instruções. Saves, configurações e conquistas aparecem em janelas de diálogo do JavaFX.
+
+**Comunicação com o MVC:** os controllers das telas só encaminham cliques. O `MenuController` pede ao `Controlador` o que é regra do jogo (nova partida, continuar, saves, conquistas, configurações). Durante a história, o `Controlador` publica eventos no `EventBus` e a `ViewFX` mostra o que recebeu na tela do jogo (`JogoController`), devolvendo o número da opção clicada. Nenhuma regra da narrativa, save ou persistência está no FXML nem nos controllers das telas.
+
+**Uma thread só:** o loop da história no `Controlador` espera a resposta do jogador. Na tela do jogo, `Platform.enterNestedEventLoop` segura a história até o clique; o clique chama `Platform.exitNestedEventLoop` e ela continua de onde parou. Para voltar ao menu no meio da partida, o `JogoController` faz a história lançar `PartidaInterrompidaException`, que o `Controlador` trata em `executarHistoria`.
+
+**Imagens das cenas:** coloque PNGs em `resources/images/cenas`, com o nome do id da cena (`prologo.png`) ou um por diálogo (`prologo_01.png`, `prologo_02.png`...). Sem imagem, a tela mostra um painel de texto.
 
 ---
 
@@ -188,9 +198,8 @@ Para executar: [COMANDO ou instrução na IDE, ex.: `mvn test`].
 
 ### Pré-requisitos
 
-* JDK [VERSÃO] instalado;
-* JavaFX SDK [VERSÃO] configurado (Fase 3);
-* [IDE ou Maven/Gradle].
+* JDK 17 ou superior;
+* Apache Maven (baixa JavaFX 21, Gson e JUnit 5 automaticamente).
 
 ### Passo a passo
 
@@ -198,12 +207,12 @@ Para executar: [COMANDO ou instrução na IDE, ex.: `mvn test`].
    ```
    git clone https://github.com/[USUARIO]/[REPOSITORIO].git
    ```
-2. Abra o projeto na IDE [NOME DA IDE] (ou entre na pasta do projeto pelo terminal);
-3. Configure o JDK [VERSÃO] e as dependências ([BIBLIOTECA JSON], JavaFX, JUnit);
-4. Execute a classe principal `[CAMINHO.DA.Main]`;
-5. Para rodar os testes: [COMANDO ou instrução].
+2. Entre na pasta do projeto (onde está o `pom.xml`);
+3. Para rodar os testes de unidade: `mvn clean test`;
+4. Para jogar com a interface gráfica: `mvn javafx:run` (classe `PartidaFX`);
+5. Para jogar pelo terminal: `mvn exec:java` (classe `Partida`).
 
-> Os arquivos de save e de configuração são gerados em `[PASTA, ex.: saves/]` na primeira execução.
+> Os arquivos de save e de configuração são gerados em `saves/` na primeira execução.
 
 ---
 
@@ -214,18 +223,18 @@ Para executar: [COMANDO ou instrução na IDE, ex.: `mvn test`].
 | Opção | Função |
 |---|---|
 | Nova partida | Inicia uma nova história (usando o personagem favorito ou criando um novo) |
-| Carregar partida | Retoma uma partida salva em um dos slots |
+| Continuar partida | Retoma o salvamento automático |
+| Carregar / gerenciar saves | Carrega ou exclui saves dos slots |
 | Instruções | Explica como jogar |
 | Conquistas | Mostra as conquistas desbloqueadas |
 | Configurações | Altera as preferências persistentes |
 | Créditos | Exibe a dupla e a disciplina |
 | Sair | Encerra o jogo |
 
-> [AJUSTAR as opções conforme o menu real.]
 
 ### 8.2 Durante a partida
 
-[PREENCHER: como escolher opções (número/clique), como salvar, como acompanhar atributos/recursos/relacionamentos, como voltar ao menu.]
+Clique no botão da opção desejada (ou em "Continuar" quando não há escolha). Em cada ato aparece um ponto de salvamento: continuar, salvar manualmente ou voltar ao menu. O botão "Status e inventário" mostra atributos, relacionamentos e itens, e "Voltar ao menu" encerra a partida (com confirmação).
 
 ---
 

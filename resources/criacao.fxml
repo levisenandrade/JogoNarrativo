@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="12.0"
+      xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CriacaoController">
+   <padding>
+      <Insets bottom="40" left="200" right="200" top="40" />
+   </padding>
+
+   <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Seu protagonista" />
+
+   <Label text="Nome" />
+   <TextField fx:id="campoNome" />
+
+   <Label text="Idade" />
+   <TextField fx:id="campoIdade" />
+
+   <Label text="Gênero" />
+   <TextField fx:id="campoGenero" />
+
+   <Label fx:id="rotuloErro" style="-fx-text-fill: #c62828;" wrapText="true" />
+
+   <HBox alignment="CENTER" spacing="15.0">
+      <Button onAction="#aoVoltar" prefWidth="110.0" text="Voltar" />
+      <Button defaultButton="true" onAction="#aoComecar" prefWidth="110.0" text="Começar" />
+   </HBox>
+</VBox>

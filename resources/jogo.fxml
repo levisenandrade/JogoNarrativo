@@ -8,6 +8,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="JogoController" prefWidth="1050" prefHeight="780"
@@ -26,20 +28,23 @@
   <center>
     <VBox spacing="12" fillWidth="true">
       <padding><Insets top="22" left="34" right="34" bottom="8"/></padding>
-      <StackPane prefHeight="327" minHeight="150" maxHeight="360" VBox.vgrow="NEVER"
+      <!-- imagem reduzida (327 -> 260) para sobrar mais altura para o texto -->
+      <StackPane prefHeight="260" minHeight="120" maxHeight="300" VBox.vgrow="NEVER"
                  style="-fx-background-color: linear-gradient(to bottom right, #263849, #111924); -fx-border-color: #3a4a5a; -fx-border-width: 1;">
-        <ImageView fx:id="imagemCena" fitWidth="982" fitHeight="327" preserveRatio="true" smooth="true" visible="false"/>
+        <ImageView fx:id="imagemCena" fitWidth="982" fitHeight="260" preserveRatio="true" smooth="true" visible="false"/>
         <Label fx:id="rotuloImagemPendente" text="SANTA AURORA" wrapText="true"
                style="-fx-text-fill: #a9a6a0; -fx-font-size: 18px; -fx-font-weight: bold;"/>
       </StackPane>
-      <ScrollPane fx:id="painelDeTexto" fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" prefHeight="120" minHeight="60"
+      <ScrollPane fx:id="painelDeTexto" fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" prefHeight="160" minHeight="140"
                   style="-fx-background: #101724; -fx-background-color: transparent; -fx-border-color: transparent;">
         <content>
           <VBox spacing="12" style="-fx-background-color: #101724;">
             <padding><Insets top="9" right="12" left="12" bottom="18"/></padding>
             <Label fx:id="rotuloPersonagem" style="-fx-text-fill: #d9b477; -fx-font-size: 20px; -fx-font-weight: bold;"/>
-            <Label fx:id="rotuloTexto" wrapText="true" maxWidth="99999"
-                   style="-fx-text-fill: #edeae5; -fx-font-size: 18px; -fx-line-spacing: 5px;"/>
+            <!-- TextFlow + Text: calcula a altura certa do texto quebrado (o Label cortava com "...") -->
+            <TextFlow lineSpacing="5">
+              <Text fx:id="textoNarrativa" style="-fx-fill: #edeae5; -fx-font-size: 18px;"/>
+            </TextFlow>
           </VBox>
         </content>
       </ScrollPane>

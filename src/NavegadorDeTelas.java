@@ -36,7 +36,7 @@ public class NavegadorDeTelas {
 
     /** mostra a tela da narrativa e devolve o controller dela (ou null se não foi possível abrir) */
     public JogoController mostrarJogo() {
-        Object tela = trocarTela("/jogo.fxml", "Santa Aurora — Narrativa", 1050, 780);
+        Object tela = trocarTela("/jogo.fxml", "Santa Aurora — Narrativa", 1050, 850);
         return (JogoController) tela;
     }
 

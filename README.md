@@ -176,7 +176,7 @@ A interface usa JavaFX com telas em FXML: menu inicial, criação do protagonist
 
 **Uma thread só:** o loop da história no `Controlador` espera a resposta do jogador. Na tela do jogo, `Platform.enterNestedEventLoop` segura a história até o clique; o clique chama `Platform.exitNestedEventLoop` e ela continua de onde parou. Para voltar ao menu no meio da partida, o `JogoController` faz a história lançar `PartidaInterrompidaException`, que o `Controlador` trata em `executarHistoria`.
 
-**Imagens das cenas:** coloque PNGs em `resources/images/cenas`, com o nome do id da cena (`prologo.png`) ou um por diálogo (`prologo_01.png`, `prologo_02.png`...). Sem imagem, a tela mostra um painel de texto.
+**Imagens das cenas:** os PNGs ficam em `resources/images/cenas` (proporção 3:1, ideal 1964x654). A tabela `src/CatalogoDeImagens.java` associa cada diálogo (`idDaCena_NN`) a um arquivo; se não constar, o jogo procura `idDaCena_NN.png`, depois `idDaCena.png`, e por fim mostra um painel de texto. Veja `resources/images/cenas/LEIA-ME.md`.
 
 ---
 

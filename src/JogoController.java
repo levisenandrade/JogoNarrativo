@@ -55,7 +55,6 @@ public class JogoController implements Tela {
     public void definirCena(String id) {
         cenaAtual = id;
         atualizarCabecalho();
-        atualizarArte(0);
     }
 
     private void atualizarCabecalho() {
@@ -84,7 +83,10 @@ public class JogoController implements Tela {
         }
 
         atualizarCabecalho();
-        atualizarArte(indice);
+
+        if (indice > 0) { // 0 = escolha bloqueada: o jogador escolhe de novo e a imagem continua a mesma
+            atualizarArte(indice);
+        }
 
         String[] alternativas = null;
 
@@ -185,7 +187,7 @@ public class JogoController implements Tela {
 
     // ---------------------------------------------------------------- botões do topo
 
-  @FXML
+    @FXML
     private void aoStatus() {
         if (estado == null) {
             return;
@@ -196,35 +198,30 @@ public class JogoController implements Tela {
         String informacoes = protagonista.getNome() + "  ·  " + protagonista.getIdade() + " anos\n\n";
 
         for (String atributo : protagonista.getAtributos().keySet()) {
-            informacoes += atributo + ": " + protagonista.getAtributo(atributo) + "\n";
+            informacoes = informacoes + atributo + ": " + protagonista.getAtributo(atributo) + "\n";
         }
 
-        informacoes += "\nRelacionamentos\n"
+        informacoes = informacoes + "\nRelacionamentos\n"
                 + "Jonas: " + estado.getJonas().getConfianca() + "\n"
                 + "Daniel: " + estado.getDaniel().getConfianca() + "\n"
                 + "Helena: " + estado.getHelena().getConfianca() + "\n";
 
-        informacoes += "\nInventário\n";
+        informacoes = informacoes + "\nInventário\n";
         List<Integer> itens = protagonista.getInventario().getIdsDosItensDisponiveis();
 
         if (itens.isEmpty()) {
-            informacoes += "Nenhum item disponível.";
+            informacoes = informacoes + "Nenhum item disponível.";
         } else {
             for (Integer id : itens) {
                 Item item = protagonista.getInventario().itemPorId(id);
 
                 if (item != null) {
-                    informacoes += "• " + item.getNome() + "\n";
+                    informacoes = informacoes + "• " + item.getNome() + "\n";
                 }
             }
         }
 
-        int decisoesTomadas = estado.getDecisoes().size();
-        int totalDecisoes = 18;
-        double porcentagem = (decisoesTomadas * 100.0) / totalDecisoes;
-
-        informacoes += "\nDecisões: " + decisoesTomadas ;
-        informacoes += String.format("\nProgresso do jogo: %.1f%%", porcentagem);
+        informacoes = informacoes + "\nDecisões: " + estado.getDecisoes().size();
 
         Alert status = new Alert(Alert.AlertType.INFORMATION, informacoes, ButtonType.OK);
         status.setTitle("Status da partida");
@@ -261,7 +258,15 @@ public class JogoController implements Tela {
         if (cenaAtual == null || cenaAtual.isBlank()) return;
         String identificador = cenaAtual.replaceAll("[^A-Za-z0-9_-]", "_");
         URL caminho = null;
-        if (indice > 0) {
+
+        // 1º: o catálogo diz qual arquivo usar neste diálogo
+        String arquivo = CatalogoDeImagens.arquivoDe(identificador, indice);
+        if (arquivo != null) {
+            caminho = getClass().getResource("/images/cenas/" + arquivo + ".png");
+        }
+
+        // 2º: arquivo com o nome do diálogo (idDaCena_NN.png); 3º: arquivo com o nome da cena (idDaCena.png)
+        if (caminho == null && indice > 0) {
             caminho = getClass().getResource(String.format("/images/cenas/%s_%02d.png", identificador, indice));
         }
         if (caminho == null) caminho = getClass().getResource("/images/cenas/" + identificador + ".png");
@@ -273,7 +278,9 @@ public class JogoController implements Tela {
             return;
         }
         try {
-            imagemCena.setImage(new Image(caminho.toExternalForm(), true));
+            // carrega na hora (sem segundo plano) para a imagem aparecer junto com o texto;
+            // 1964 px é o dobro da largura da caixa, suficiente para telas de alta densidade
+            imagemCena.setImage(new Image(caminho.toExternalForm(), 1964, 0, true, true));
             imagemCena.setVisible(true);
             rotuloImagemPendente.setVisible(false);
         } catch (IllegalArgumentException e) {

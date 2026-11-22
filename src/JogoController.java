@@ -185,7 +185,7 @@ public class JogoController implements Tela {
 
     // ---------------------------------------------------------------- botões do topo
 
-    @FXML
+  @FXML
     private void aoStatus() {
         if (estado == null) {
             return;
@@ -196,30 +196,35 @@ public class JogoController implements Tela {
         String informacoes = protagonista.getNome() + "  ·  " + protagonista.getIdade() + " anos\n\n";
 
         for (String atributo : protagonista.getAtributos().keySet()) {
-            informacoes = informacoes + atributo + ": " + protagonista.getAtributo(atributo) + "\n";
+            informacoes += atributo + ": " + protagonista.getAtributo(atributo) + "\n";
         }
 
-        informacoes = informacoes + "\nRelacionamentos\n"
+        informacoes += "\nRelacionamentos\n"
                 + "Jonas: " + estado.getJonas().getConfianca() + "\n"
                 + "Daniel: " + estado.getDaniel().getConfianca() + "\n"
                 + "Helena: " + estado.getHelena().getConfianca() + "\n";
 
-        informacoes = informacoes + "\nInventário\n";
+        informacoes += "\nInventário\n";
         List<Integer> itens = protagonista.getInventario().getIdsDosItensDisponiveis();
 
         if (itens.isEmpty()) {
-            informacoes = informacoes + "Nenhum item disponível.";
+            informacoes += "Nenhum item disponível.";
         } else {
             for (Integer id : itens) {
                 Item item = protagonista.getInventario().itemPorId(id);
 
                 if (item != null) {
-                    informacoes = informacoes + "• " + item.getNome() + "\n";
+                    informacoes += "• " + item.getNome() + "\n";
                 }
             }
         }
 
-        informacoes = informacoes + "\nDecisões: " + estado.getDecisoes().size();
+        int decisoesTomadas = estado.getDecisoes().size();
+        int totalDecisoes = 18;
+        double porcentagem = (decisoesTomadas * 100.0) / totalDecisoes;
+
+        informacoes += "\nDecisões: " + decisoesTomadas ;
+        informacoes += String.format("\nProgresso do jogo: %.1f%%", porcentagem);
 
         Alert status = new Alert(Alert.AlertType.INFORMATION, informacoes, ButtonType.OK);
         status.setTitle("Status da partida");

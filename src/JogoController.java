@@ -188,47 +188,52 @@ public class JogoController implements Tela {
     // ---------------------------------------------------------------- botões do topo
 
     @FXML
-    private void aoStatus() {
-        if (estado == null) {
-            return;
-        }
+   private void aoStatus() {
+    if (estado == null) {
+        return;
+    }
 
-        Protagonista protagonista = estado.getProtagonista();
+    Protagonista protagonista = estado.getProtagonista();
 
-        String informacoes = protagonista.getNome() + "  ·  " + protagonista.getIdade() + " anos\n\n";
+    String informacoes = protagonista.getNome() + "  ·  " + protagonista.getIdade() + " anos\n\n";
 
-        for (String atributo : protagonista.getAtributos().keySet()) {
-            informacoes = informacoes + atributo + ": " + protagonista.getAtributo(atributo) + "\n";
-        }
+    for (String atributo : protagonista.getAtributos().keySet()) {
+        informacoes += atributo + ": " + protagonista.getAtributo(atributo) + "\n";
+    }
 
-        informacoes = informacoes + "\nRelacionamentos\n"
-                + "Jonas: " + estado.getJonas().getConfianca() + "\n"
-                + "Daniel: " + estado.getDaniel().getConfianca() + "\n"
-                + "Helena: " + estado.getHelena().getConfianca() + "\n";
+    informacoes += "\nRelacionamentos\n"
+            + "Jonas: " + estado.getJonas().getConfianca() + "\n"
+            + "Daniel: " + estado.getDaniel().getConfianca() + "\n"
+            + "Helena: " + estado.getHelena().getConfianca() + "\n";
 
-        informacoes = informacoes + "\nInventário\n";
-        List<Integer> itens = protagonista.getInventario().getIdsDosItensDisponiveis();
+    informacoes += "\nInventário\n";
+    List<Integer> itens = protagonista.getInventario().getIdsDosItensDisponiveis();
 
-        if (itens.isEmpty()) {
-            informacoes = informacoes + "Nenhum item disponível.";
-        } else {
-            for (Integer id : itens) {
-                Item item = protagonista.getInventario().itemPorId(id);
+    if (itens.isEmpty()) {
+        informacoes += "Nenhum item disponível.";
+    } else {
+        for (Integer id : itens) {
+            Item item = protagonista.getInventario().itemPorId(id);
 
-                if (item != null) {
-                    informacoes = informacoes + "• " + item.getNome() + "\n";
-                }
+            if (item != null) {
+                informacoes += "• " + item.getNome() + "\n";
             }
         }
-
-        informacoes = informacoes + "\nDecisões: " + estado.getDecisoes().size();
-
-        Alert status = new Alert(Alert.AlertType.INFORMATION, informacoes, ButtonType.OK);
-        status.setTitle("Status da partida");
-        status.setHeaderText(estado.getAto().getRotulo());
-        status.getDialogPane().setPrefWidth(460);
-        status.showAndWait();
     }
+
+    int decisoesTomadas = estado.getDecisoes().size();
+    int totalDecisoes = 18;
+    double porcentagem = (decisoesTomadas * 100.0) / totalDecisoes;
+
+    informacoes += "\nDecisões: " + decisoesTomadas;
+    informacoes += String.format("\nProgresso do jogo: %.1f%%", porcentagem);
+
+    Alert status = new Alert(Alert.AlertType.INFORMATION, informacoes, ButtonType.OK);
+    status.setTitle("Status da partida");
+    status.setHeaderText(estado.getAto().getRotulo());
+    status.getDialogPane().setPrefWidth(460);
+    status.showAndWait();
+}
 
     @FXML
     private void aoMenu() {

@@ -115,9 +115,18 @@ As cenas do jogo ficam em arquivos JSON, e não dentro do código. O `Carregador
 
 ## 5. Detalhamento das Funcionalidades
 
-### 5.1. Protagonista e atributos
+## 5.1. Protagonista e atributos
 
-O protagonista é configurado pelo jogador no início da partida e possui [N] atributos variáveis ([LISTAR, ex.: Coragem, Inteligência, ...]), todos iniciando em **0** e evoluindo conforme as escolhas.
+O protagonista é configurado pelo jogador no início da partida (nome, idade e gênero) e possui **4 atributos variáveis**, todos iniciando em **0** e limitados a **100**:
+
+| Atributo | Papel na história |
+|---|---|
+| Razão | Caminho da lei e das provas; leva ao final *A Balança* |
+| Paranoia | Caminho da desconfiança e da revolta popular; leva ao final *A Névoa se Levanta* |
+| Violência | Caminho da força e da vingança; leva ao final *O Preço do Sangue* |
+| Provas | Evidências reunidas ao longo da investigação |
+
+Os atributos evoluem conforme as escolhas (as opções de caráter costumam dar +3 no atributo correspondente, e as de investigação dão +1 em Provas) e podem ser exigidos como condição de acesso a certas opções (ver 5.4).
 
 ### 5.2. Personagens e relacionamentos
 
@@ -125,35 +134,68 @@ O jogo conta com 3 personagens relevantes (Daniel, Helena e Jonas). Os relaciona
 
 ### 5.3. Recursos gerenciáveis
 
-[PREENCHER: quais recursos o jogo possui — inventário, pontos de ação, energia, dinheiro, pistas, habilidades — e como são consumidos/obtidos.]
+O recurso gerenciável do jogo é o **inventário**, gerenciado pela classe `Inventario`. Ele guarda **os itens, pistas e marcadores** definidos no `CatalogoDeItens` (37 ids, por exemplo, Cartão do IML, Pé de Cabra, Diário de Gabriel e Gravação de Gabriel).
+
+Todos os itens são cadastrados no início da partida com status *desabilitado*. O jogador não "cria" itens: ele os **obtém** quando uma escolha com efeito `ADICIONAR_ITEM` é selecionada, e o item passa a contar como possuído. Os itens se organizam por tipo:
+
+| Tipo | Exemplos | Uso |
+|---|---|---|
+| Acesso | Cartão do IML, Chave Mestra do Cartório, Pé de Cabra | Liberam opções que dependem de entrar em um local |
+| Evidência | Laudo Adulterado, Diário de Gabriel, Gravação de Gabriel | Provas da investigação; também exigidas nos finais |
+| Pista | Canal do Gabinete, Nome do Assessor | Registram o que foi descoberto em interrogatórios |
+| Equipamento | Rádio da Polícia, Pistola Tática | Habilitam ações específicas |
+| Status | Procurado por Agressão, Alarme Disparado | Marcam consequências de decisões passadas |
+| Marcador de rota | Rota Ativada: A Queda pelo Direito (e as outras duas) | Indicam a rota do Ato V |
+
+Um item é **usado** como requisito de acesso de uma escolha (ver 5.4). Os itens não são consumidos: o `Inventario` apenas habilita ou desabilita o item. O botão **"Status e inventário"** mostra atributos, relacionamentos e itens a qualquer momento.
 
 ### 5.4. Escolhas, consequências e condições de acesso
 
-Cada escolha pode ter **condições de acesso** (por exemplo, exigir um atributo mínimo, um item ou um nível de confiança) que bloqueiam ou liberam opções, além de **efeitos** que alteram o estado da partida. [PREENCHER: dar 1 ou 2 exemplos reais do jogo.] + adicionar o vídeo aqui da restrição de acesso
+Cada `Escolha` pode ter **condições de acesso** (item possuído, atributo mínimo ou confiança mínima com um NPC), que o `EstadoPartida.motivoDeBloqueio` confere antes de liberar a opção, e **efeitos** (`Efeito`), que alteram atributos, confiança de NPCs ou inventário, ou encerram a partida (*game over*). Quando uma opção está bloqueada, o jogador vê o motivo, como "Você não possui confiança suficiente com Helena".
+
+Exemplos reais do jogo:
+
+* **Atributo mínimo (Ato IV, escolha decisiva):** as três opções que levam ao Ato V exigem **15 pontos** no atributo da rota (Razão, Paranoia ou Violência). Quem não atinge nenhum dos limites só tem a opção de tentar um discurso sem provas, que resulta em *game over*.
+* **Confiança com NPC (Ato IV):** a opção de pedir que Helena distraia Daniel exige **confiança ≥ 70** com ela. Com confiança menor, a mesma ação leva a um *game over*.
+* **Atributo + item (Ato VI):** cada final exige **24 pontos** no atributo da rota *e* um item específico: *A Balança* pede o Diário de Gabriel (item 10), *A Névoa* pede a Gravação de Gabriel (item 11) e *O Preço do Sangue* pede o Laudo Adulterado (item 8).
+* **Efeitos:** as opções de caráter dão +3 no atributo correspondente e, na decisão do Ato IV, ainda concedem um item de marcador de rota (ids 35, 36 e 37).
+
+Quando "Mostrar efeitos das escolhas" está ativado nas configurações, as consequências numéricas são exibidas após cada escolha.
+
+▶️ [Inserir aqui o vídeo da restrição de acesso]
 
 ### 5.5. Finais
 
 <details>
   <summary> Visualizar finais </summary>
 
-  
-  O jogo possui 3 finais distintos, ligados às rotas narrativas:
-  
-  | Final | Rota |
-  |---|---|
-  | Razão | [PREENCHER: o que leva a este final] |
-  | Paranoia | [PREENCHER: o que leva a este final] |
-  | Violência | [PREENCHER: o que leva a este final] |
+  O jogo possui 3 finais distintos, ligados às rotas narrativas. A rota é escolhida na decisão do Ato IV (Razão, Paranoia ou Violência) e o final é escolhido no Ato VI, a partir do atributo e do item exigidos. A rota define a cena do Ato V.
+
+  | Final | Rota | Condição no Ato VI |
+  |---|---|---|
+  | A Balança (Razão) | Ato V, "A Queda pelo Direito": o Prefeito é preso em plenário, com as provas expostas à Polícia Federal | Razão ≥ 24 e Diário de Gabriel |
+  | A Névoa se Levanta (Paranoia) | Ato V, "A Revolta da Cidade": a população cerca a câmara e derruba o governo | Paranoia ≥ 24 e Gravação de Gabriel |
+  | O Preço do Sangue (Violência) | Ato V, "A Sentença de Sangue": o Prefeito é forçado a assinar a confissão sob ameaça de arma | Violência ≥ 24 e Laudo Adulterado |
+
+  Além dos três finais, existem desfechos de *game over*, como "O Silêncio de Santa Aurora" (abandonar a cidade no Ato VI), que não são contados como final.
 
 </details>
 
 ### 5.6. Sistema de saves (Fase 2)
 
-* Múltiplos *slots* de save;
-* Salvamento **manual** e **automático** [PREENCHER: em quais momentos ocorre o automático];
-* Sobrescrita e exclusão de saves;
-* Tratamento de falhas por **exceções customizadas** [colocar as exceções, talvez a prioridade das exceções]
+* **Múltiplos slots:** 3 slots manuais (1 a 3) e 1 slot de salvamento automático (0), gravados em `saves/` como `slot1.json`, `slot2.json`, `slot3.json` e `autosave.json`;
+* **Salvamento automático:** ocorre ao **entrar em cada ponto de salvamento** (todos os atos, exceto Prólogo, Final e Fim) e só o jogo grava nesse slot. A opção **Continuar partida** retoma o save mais recente entre os slots;
+* **Salvamento manual:** oferecido no mesmo ponto, em que o jogador escolhe entre continuar, salvar ou voltar ao menu;
+* **Sobrescrita e exclusão:** salvar em um slot ocupado pede confirmação antes de sobrescrever; os saves podem ser excluídos (também com confirmação) em **Carregar / gerenciar saves**;
+* **Tratamento de falhas:** todas as falhas de persistência derivam de `PersistenciaException`. O `Controlador` captura cada uma, avisa o jogador e segue sem encerrar o programa:
 
+| Exceção | Quando é lançada |
+|---|---|
+| `SaveException` | Falha ao gravar ou excluir (disco cheio, sem permissão, slot inválido) |
+| `CarregamentoException` | Falha ao ler um save (slot vazio ou slot inválido, arquivo ilegível) |
+| `DadosInvalidosException` (subclasse de `CarregamentoException`) | Arquivo lido, mas sem conteúdo válido (JSON malformado, campo faltando, valor fora do intervalo, item inexistente, versão incompatível) |
+| `CenaInvalidaException` | JSON de cena ausente, malformado ou com personagem, item, atributo ou efeito desconhecido |
+| `PartidaInterrompidaException` (`RuntimeException`) | O jogador volta ao menu no meio da história (Fase 3); tratada em `executarHistoria` |
 ### 5.7. Configurações persistentes (Fase 2)
 
 Três preferências do jogador são gravadas em JSON e restauradas ao abrir o jogo:

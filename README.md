@@ -162,7 +162,19 @@ Exemplos reais do jogo:
 
 Quando "Mostrar efeitos das escolhas" está ativado nas configurações, as consequências numéricas são exibidas após cada escolha.
 
-▶️ [Inserir aqui o vídeo da restrição de acesso]
+
+<details>
+  <summary><strong>Restrição de acesso — Item necessário não encontrado</strong></summary>
+
+  <p>Exemplo de restrição de acesso quando o jogador não possui o item necessário.</p>
+
+  <img
+    src="https://github.com/user-attachments/assets/a6136bc8-00f1-4a3f-8169-38148ebf0aae"
+    alt="Tela de restrição de acesso por ausência de item"
+    width="968"
+  />
+</details>
+
 
 ### 5.5. Finais
 
@@ -229,12 +241,6 @@ A interface usa JavaFX com telas em FXML: menu inicial, criação do protagonist
 Os testes cobrem [PREENCHER: classes/regras testadas, ex.: efeitos de escolhas, condições de acesso, cálculo de relacionamento, serialização e desserialização do `EstadoPartida`].
 
 Para executar: [COMANDO ou instrução na IDE, ex.: `mvn test`].
-
-### 6.2. Limitações conhecidas
-
-- [PREENCHER: ex.: conteúdo narrativo limitado a N cenas]
-- [PREENCHER: ex.: ausência de áudio/imagens na interface]
-- [PREENCHER: outras limitações reais]
 
 ## 7. Instruções de Reprodução
 

@@ -35,7 +35,7 @@ O desenvolvimento foi dividido em três fases:
 | Interface (Fases 1 e 2) | Terminal (console) |
 | Interface (Fase 3) | JavaFX |
 | Persistência | Arquivos JSON - Biblioteca: Gson |
-| Testes de unidade | JUnit 4/5 |
+| Testes de unidade | JUnit 5 |
 | Gerenciador de build | Maven |
 | IDE de desenvolvimento | IntelliJ IDEA |
 | Controle de versão | Git / GitHub |
@@ -46,7 +46,11 @@ O desenvolvimento foi dividido em três fases:
 
 ### 3.1. Programação Orientada a Objetos
 
-O projeto foi modelado com classes que representam as entidades do domínio do jogo (protagonista, personagens não jogáveis, cenas, escolhas, estado da partida), aplicando os conceitos de encapsulamento, abstração, herança e polimorfismo vistos em sala. [PREENCHER: citar onde herança/polimorfismo/interfaces foram usados de fato no código.]
+O projeto foi modelado com classes que representam as entidades do domínio do jogo (protagonista, personagens não jogáveis, cenas, escolhas, estado da partida), aplicando os conceitos de encapsulamento, abstração, herança e polimorfismo vistos em sala. Na prática:
+
+* **Herança:** `Protagonista` e `NPC` estendem `Personagem`; as exceções de persistência estendem `PersistenciaException` (`CarregamentoException` e `DadosInvalidosException` formam uma cadeia); os eventos de requisição estendem `EventoRequisicao`;
+* **Interfaces e polimorfismo:** `RepositorioDeSaves` (implementada por `RepositorioJson` e `RepositorioEmMemoria`), `Evento` e `EventListener`, que permitem tratar eventos e ouvintes diferentes de forma uniforme, e `Tela`, implementada pelos controllers das telas JavaFX;
+* **Encapsulamento e enums:** atributos privados com acesso controlado; `Atributo`, `Ato`, `Conquista` e `FinalDoJogo` são enums.
 
 ### 3.2. Padrão MVC
 
@@ -71,30 +75,35 @@ Foram aplicados três padrões GoF:
 
 ---
 
-
 ## 4. Arquitetura
 
-### 4.1. Organização em pacotes
+### 4.1. Organização do projeto
+
+O código-fonte fica na pasta `src/`, sem subpacotes (pacote padrão). A separação MVC é feita pelas responsabilidades das classes:
+
+| Camada | Classes principais |
+|---|---|
+| Model | `EstadoPartida`, `Protagonista`, `NPC`, `Personagem`, `Cena`, `Dialogo`, `Escolha`, `Efeito`, `Inventario`, `Item`, `CatalogoDeItens`, `Atributo`, `Ato`, `FinalDoJogo`, `Conquista` |
+| View | Terminal: `Menu` e `Entrada`. JavaFX: `ViewFX`, `NavegadorDeTelas`, `App`, `PartidaFX` e os arquivos `.fxml` |
+| Controller | `Controlador` (fluxo da história e regras) e, na interface gráfica, `MenuController`, `CriacaoController`, `JogoController`, `InstrucoesController` e `CreditosController` (apenas encaminham cliques) |
+| Persistência | `RepositorioDeSaves`, `RepositorioJson`, `RepositorioEmMemoria`, `RepositorioDeConfiguracoes`, `RepositorioDeProgresso`, `SaveData`, `CarregadorDeCenas` |
+| Eventos (Observer) | `EventBus`, `Evento`, `EventListener` e as classes `Evento...` |
+| Exceções | `PersistenciaException`, `SaveException`, `CarregamentoException`, `DadosInvalidosException`, `CenaInvalidaException`, `PartidaInterrompidaException` |
 
 ```
-src/
-├── model/         # entidades e regras do jogo
-├── view/          # exibição e entrada do jogador
-├── controller/    # fluxo do jogo e orquestração
-├── persistencia/  # leitura/escrita de JSON, saves e configurações
-├── excecoes/      # exceções customizadas
-└── Main.java
-test/              # testes de unidade
-recursos/cenas/    # arquivos JSON com as cenas
+.
+├── pom.xml
+├── src/                      # código-fonte Java
+│   ├── Partida.java          # ponto de entrada (terminal)
+│   └── PartidaFX.java        # ponto de entrada (interface gráfica)
+├── test/                     # testes de unidade (JUnit 5)
+├── resources/
+│   ├── cenas/                # arquivos JSON com as cenas
+│   ├── images/cenas/         # imagens das cenas (PNG)
+│   └── *.fxml                # telas JavaFX
+└── saves/                    # gerada na primeira execução (saves e configurações)
 ```
-
-> [AJUSTAR a árvore acima para refletir a estrutura real do repositório.]
-
-### 4.2. Diagrama de classes
-
-[INSERIR imagem ou link do diagrama de classes, ex.: `docs/diagrama-de-classes.png`]
-
-### 4.3. Fluxo geral de uma partida
+### 4.2. Fluxo geral de uma partida
 
 1. O jogador abre o **menu inicial** (Nova partida, Carregar, Instruções, Créditos, Conquistas, Configurações, Sair);
 2. Em *Nova partida*, escolhe um personagem salvo (preferência de personagem favorito) ou cria um novo protagonista;
@@ -162,7 +171,6 @@ Exemplos reais do jogo:
 
 Quando "Mostrar efeitos das escolhas" está ativado nas configurações, as consequências numéricas são exibidas após cada escolha.
 
-
 <details>
   <summary><strong>Restrição de acesso — Item necessário não encontrado</strong></summary>
 
@@ -174,7 +182,6 @@ Quando "Mostrar efeitos das escolhas" está ativado nas configurações, as cons
     width="968"
   />
 </details>
-
 
 ### 5.5. Finais
 
@@ -208,6 +215,7 @@ Quando "Mostrar efeitos das escolhas" está ativado nas configurações, as cons
 | `DadosInvalidosException` (subclasse de `CarregamentoException`) | Arquivo lido, mas sem conteúdo válido (JSON malformado, campo faltando, valor fora do intervalo, item inexistente, versão incompatível) |
 | `CenaInvalidaException` | JSON de cena ausente, malformado ou com personagem, item, atributo ou efeito desconhecido |
 | `PartidaInterrompidaException` (`RuntimeException`) | O jogador volta ao menu no meio da história (Fase 3); tratada em `executarHistoria` |
+
 ### 5.7. Configurações persistentes (Fase 2)
 
 Três preferências do jogador são gravadas em JSON e restauradas ao abrir o jogo:
@@ -238,9 +246,30 @@ A interface usa JavaFX com telas em FXML: menu inicial, criação do protagonist
 
 ### 6.1. Testes de unidade
 
-Os testes cobrem [PREENCHER: classes/regras testadas, ex.: efeitos de escolhas, condições de acesso, cálculo de relacionamento, serialização e desserialização do `EstadoPartida`].
+O projeto tem **185 testes de unidade** (JUnit 5) em 22 classes, que cobrem:
 
-Para executar: [COMANDO ou instrução na IDE, ex.: `mvn test`].
+* **Model:** atributos, protagonista, NPCs, inventário e catálogo de itens, efeitos das escolhas, diálogos, finais e o `EstadoPartida` (condições de acesso e motivos de bloqueio);
+* **Cenas:** leitura dos JSON por `CarregadorDeCenas` e a história completa (`HistoriaTest`);
+* **Persistência:** saves (`SaveData`, `RepositorioJson`, `RepositorioEmMemoria`), configurações, progresso/conquistas e personagem favorito, incluindo os casos de erro;
+* **Controlador:** fluxo da partida, com eventos e entradas simuladas;
+* **Imagens:** `CatalogoDeImagensTest` confere se todo diálogo tem imagem associada e se todos os arquivos existem.
+
+Para executar: `mvn clean test` (ou, no IntelliJ, botão direito na pasta `test` > *Run All Tests*).
+
+### 6.2. Limitações
+
+* O jogo não tem áudio nem animações de transição;
+* Sprites de personagens e *overlays* (mensagem de celular, itens em destaque) sugeridos no roteiro não foram implementados: cada diálogo mostra apenas uma imagem de cenário;
+* Algumas cenas reaproveitam imagens de outras, pois nem todos os ambientes tiveram arte própria;
+* As imagens deixam o repositório pesado (cerca de 66 MB);
+* A interface foi testada apenas em ambiente desktop, com janela de tamanho padrão.
+
+### 6.3. Melhorias futuras
+
+* Trilha sonora e efeitos sonoros;
+* Sprites e expressões dos personagens, e imagens de variação conforme a escolha do jogador;
+* Animações de transição entre cenas;
+* Mais finais e rotas, aproveitando que as cenas ficam em JSON e podem ser ampliadas sem recompilar.
 
 ## 7. Instruções de Reprodução
 
@@ -286,41 +315,37 @@ Clique no botão da opção desejada (ou em "Continuar" quando não há escolha)
 
 ---
 
-## 9. Vídeos de Demonstração da Execução
+## 9. Vídeos de Demonstração da Execução (ADICIONAR FUTURAMENTE)
 
 Os vídeos a seguir demonstram o funcionamento do jogo.
 
-### 10.1 [TÍTULO, ex.: Menu, criação do protagonista e início da história]
+### 9.1 [TÍTULO, ex.: Menu, criação do protagonista e início da história]
 
 [DESCRIÇÃO CURTA do que o vídeo mostra]
 
 [LINK ou arquivo do vídeo]
 
-### 10.2 [TÍTULO, ex.: Escolhas, consequências e relacionamentos]
+### 9.2 [TÍTULO, ex.: Escolhas, consequências e relacionamentos]
 
 [DESCRIÇÃO CURTA do que o vídeo mostra]
 
 [LINK ou arquivo do vídeo]
 
-### 10.3 [TÍTULO, ex.: Saves, configurações e conquistas]
+### 9.3 [TÍTULO, ex.: Saves, configurações e conquistas]
 
 [DESCRIÇÃO CURTA do que o vídeo mostra]
 
 [LINK ou arquivo do vídeo]
 
-### 10.4 [TÍTULO, ex.: Os três finais]
+### 9.4 [TÍTULO, ex.: Os três finais]
 
 [DESCRIÇÃO CURTA do que o vídeo mostra]
 
 [LINK ou arquivo do vídeo]
-
-> No GitHub, para exibir o vídeo direto no README, edite o README pelo navegador e arraste o arquivo de vídeo para a caixa de edição; o GitHub gera o link `https://github.com/user-attachments/assets/...` automaticamente.
 
 ---
 
-## 11. Referências
-
-[PREENCHER no padrão da disciplina/SBC. Exemplos de itens possíveis:]
+## 10. Referências
 
 * Documentação oficial do Java (Oracle).
 * Documentação do JavaFX (OpenJFX).

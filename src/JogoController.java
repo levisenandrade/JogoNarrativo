@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 
 import java.net.URL;
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.Optional;
 public class JogoController implements Tela {
     @FXML private Label rotuloAto;
     @FXML private Label rotuloPersonagem;
-    @FXML private Label rotuloTexto;
+    @FXML private Text textoNarrativa;   // antes era um Label (cortava o texto com "...")
     @FXML private Label rotuloAviso;
     @FXML private Label rotuloImagemPendente;
     @FXML private VBox caixaDeOpcoes;
@@ -121,11 +122,40 @@ public class JogoController implements Tela {
 
     // ---------------------------------------------------------------- espera pelo clique
 
+    /**
+     * Tira do texto as linhas de separador (=====) usadas na versão de console
+     * e as linhas vazias do começo e do fim. As demais quebras de linha são mantidas.
+     */
+    private static String preparar(String texto) {
+        if (texto == null) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        for (String linha : texto.split("\\R", -1)) {
+            if (linha.strip().matches("=+")) {
+                continue;
+            }
+            sb.append(linha).append('\n');
+        }
+
+        return sb.toString().strip();
+    }
+
     /** monta a tela e espera o clique. Sem opções, mostra o botão Continuar e devolve 0. */
     private int exibir(String personagem, String texto, String aviso, String[] opcoes) {
         rotuloPersonagem.setText(personagem == null ? "" : personagem);
-        rotuloTexto.setText(texto == null ? "" : texto);
-        rotuloAviso.setText(aviso == null ? "" : aviso);
+        rotuloPersonagem.setVisible(personagem != null && !personagem.isEmpty());
+        rotuloPersonagem.setManaged(personagem != null && !personagem.isEmpty());
+
+        textoNarrativa.setText(preparar(texto));
+
+        boolean temAviso = aviso != null && !aviso.isBlank();
+        rotuloAviso.setText(temAviso ? aviso : "");
+        rotuloAviso.setVisible(temAviso);
+        rotuloAviso.setManaged(temAviso); // sem aviso, não reserva espaço no rodapé
+
         painelDeTexto.setVvalue(0);
         painelDeOpcoes.setVvalue(0);
         caixaDeOpcoes.getChildren().clear();
@@ -188,52 +218,52 @@ public class JogoController implements Tela {
     // ---------------------------------------------------------------- botões do topo
 
     @FXML
-   private void aoStatus() {
-    if (estado == null) {
-        return;
-    }
+    private void aoStatus() {
+        if (estado == null) {
+            return;
+        }
 
-    Protagonista protagonista = estado.getProtagonista();
+        Protagonista protagonista = estado.getProtagonista();
 
-    String informacoes = protagonista.getNome() + "  ·  " + protagonista.getIdade() + " anos\n\n";
+        String informacoes = protagonista.getNome() + "  ·  " + protagonista.getIdade() + " anos\n\n";
 
-    for (String atributo : protagonista.getAtributos().keySet()) {
-        informacoes += atributo + ": " + protagonista.getAtributo(atributo) + "\n";
-    }
+        for (String atributo : protagonista.getAtributos().keySet()) {
+            informacoes += atributo + ": " + protagonista.getAtributo(atributo) + "\n";
+        }
 
-    informacoes += "\nRelacionamentos\n"
-            + "Jonas: " + estado.getJonas().getConfianca() + "\n"
-            + "Daniel: " + estado.getDaniel().getConfianca() + "\n"
-            + "Helena: " + estado.getHelena().getConfianca() + "\n";
+        informacoes += "\nRelacionamentos\n"
+                + "Jonas: " + estado.getJonas().getConfianca() + "\n"
+                + "Daniel: " + estado.getDaniel().getConfianca() + "\n"
+                + "Helena: " + estado.getHelena().getConfianca() + "\n";
 
-    informacoes += "\nInventário\n";
-    List<Integer> itens = protagonista.getInventario().getIdsDosItensDisponiveis();
+        informacoes += "\nInventário\n";
+        List<Integer> itens = protagonista.getInventario().getIdsDosItensDisponiveis();
 
-    if (itens.isEmpty()) {
-        informacoes += "Nenhum item disponível.";
-    } else {
-        for (Integer id : itens) {
-            Item item = protagonista.getInventario().itemPorId(id);
+        if (itens.isEmpty()) {
+            informacoes += "Nenhum item disponível.";
+        } else {
+            for (Integer id : itens) {
+                Item item = protagonista.getInventario().itemPorId(id);
 
-            if (item != null) {
-                informacoes += "• " + item.getNome() + "\n";
+                if (item != null) {
+                    informacoes += "• " + item.getNome() + "\n";
+                }
             }
         }
+
+        int decisoesTomadas = estado.getDecisoes().size();
+        int totalDecisoes = 18;
+        double porcentagem = (decisoesTomadas * 100.0) / totalDecisoes;
+
+        informacoes += "\nDecisões: " + decisoesTomadas;
+        informacoes += String.format("\nProgresso do jogo: %.1f%%", porcentagem);
+
+        Alert status = new Alert(Alert.AlertType.INFORMATION, informacoes, ButtonType.OK);
+        status.setTitle("Status da partida");
+        status.setHeaderText(estado.getAto().getRotulo());
+        status.getDialogPane().setPrefWidth(460);
+        status.showAndWait();
     }
-
-    int decisoesTomadas = estado.getDecisoes().size();
-    int totalDecisoes = 18;
-    double porcentagem = (decisoesTomadas * 100.0) / totalDecisoes;
-
-    informacoes += "\nDecisões: " + decisoesTomadas;
-    informacoes += String.format("\nProgresso do jogo: %.1f%%", porcentagem);
-
-    Alert status = new Alert(Alert.AlertType.INFORMATION, informacoes, ButtonType.OK);
-    status.setTitle("Status da partida");
-    status.setHeaderText(estado.getAto().getRotulo());
-    status.getDialogPane().setPrefWidth(460);
-    status.showAndWait();
-}
 
     @FXML
     private void aoMenu() {

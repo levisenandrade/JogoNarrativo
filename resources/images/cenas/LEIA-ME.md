@@ -15,3 +15,8 @@ Tamanho recomendado das imagens: 1964 x 654 px (ou 2172 x 724 px). Formato PNG.
 
 O teste `CatalogoDeImagensTest` confere se todo diálogo tem imagem e se todos os arquivos existem.
 Imagem sem uso no momento: `viela-barbearia-corpo.png` (game over do Ato III 1B).
+
+## Imagens com personagens
+- Jonas: `jonas-lanterna`, `jonas-bolso`, `jonas-envelope` (Ato I, diálogos 04 a 06).
+- Daniel: `daniel-mao` (Ato II 1A, diálogo 02), `daniel-cigarro` (Ato II 1A diálogo 03 e rota 3A diálogo 03), `daniel-estacao` (Ato II 1B, diálogo 02).
+- Helena: `helena-garagem` (Ato III, diálogo 02 das quatro perspectivas), `helena-forum` (Final 1), `helena-estufa` (Final 2).

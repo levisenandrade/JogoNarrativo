@@ -32,19 +32,19 @@ public class CatalogoDeImagens {
         IMAGENS.put("ato_1_01", "onibus-interior");
         IMAGENS.put("ato_1_02", "rodoviaria");
         IMAGENS.put("ato_1_03", "rodoviaria");
-        IMAGENS.put("ato_1_04", "bairro-residencial");
-        IMAGENS.put("ato_1_05", "bairro-residencial");
-        IMAGENS.put("ato_1_06", "bairro-residencial");
+        IMAGENS.put("ato_1_04", "jonas-lanterna");
+        IMAGENS.put("ato_1_05", "jonas-bolso");
+        IMAGENS.put("ato_1_06", "jonas-envelope");
         IMAGENS.put("ato_1_07", "beco-delegacia");
         IMAGENS.put("fim_ato_1_01", "banca-de-jornal");
 
         // ---------------------------------------------------------------- ato II
         IMAGENS.put("ato2_opcao1a_01", "delegacia-fundos");
-        IMAGENS.put("ato2_opcao1a_02", "delegacia-fundos");
-        IMAGENS.put("ato2_opcao1a_03", "sala-detetive");
+        IMAGENS.put("ato2_opcao1a_02", "daniel-mao");
+        IMAGENS.put("ato2_opcao1a_03", "daniel-cigarro");
 
         IMAGENS.put("ato2_opcao1b_01", "escritorio-detetive");
-        IMAGENS.put("ato2_opcao1b_02", "escritorio-detetive");
+        IMAGENS.put("ato2_opcao1b_02", "daniel-estacao");
 
         IMAGENS.put("ato2_rota2a_01", "fabrica-exterior");
         IMAGENS.put("ato2_rota2a_02", "fabrica-subsolo");
@@ -57,28 +57,28 @@ public class CatalogoDeImagens {
 
         IMAGENS.put("ato2_rota3a_01", "beco-delegacia");
         IMAGENS.put("ato2_rota3a_02", "sala-interrogatorio");
-        IMAGENS.put("ato2_rota3a_03", "delegacia-fundos");
+        IMAGENS.put("ato2_rota3a_03", "daniel-cigarro");
 
         IMAGENS.put("ato2_rota3b_01", "delegacia-fundos");
 
         // ---------------------------------------------------------------- ato III
         IMAGENS.put("ato3_perspectiva1a_01", "delegacia-fundos");
-        IMAGENS.put("ato3_perspectiva1a_02", "jornal-capa");
+        IMAGENS.put("ato3_perspectiva1a_02", "helena-garagem");
         IMAGENS.put("ato3_perspectiva1a_03", "beco-escuro");
         IMAGENS.put("ato3_perspectiva1a_04", "prefeitura-fachada");
 
         IMAGENS.put("ato3_perspectiva1b_01", "delegacia-fundos");
-        IMAGENS.put("ato3_perspectiva1b_02", "jornal-capa");
+        IMAGENS.put("ato3_perspectiva1b_02", "helena-garagem");
         IMAGENS.put("ato3_perspectiva1b_03", "viela-barbearia");
         IMAGENS.put("ato3_perspectiva1b_04", "cidade-de-cima-noite");
 
         IMAGENS.put("ato3_perspectiva2a_01", "arquivo-municipal-interior");
-        IMAGENS.put("ato3_perspectiva2a_02", "jornal-capa");
+        IMAGENS.put("ato3_perspectiva2a_02", "helena-garagem");
         IMAGENS.put("ato3_perspectiva2a_03", "viela-barbearia");
         IMAGENS.put("ato3_perspectiva2a_04", "cidade-de-cima-noite");
 
         IMAGENS.put("ato3_perspectiva3a_01", "arquivo-municipal-fachada");
-        IMAGENS.put("ato3_perspectiva3a_02", "jornal-capa");
+        IMAGENS.put("ato3_perspectiva3a_02", "helena-garagem");
         IMAGENS.put("ato3_perspectiva3a_03", "praca-matriz-amanhecer");
         IMAGENS.put("ato3_perspectiva3a_04", "prefeitura-saguao");
 
@@ -103,11 +103,11 @@ public class CatalogoDeImagens {
         // ---------------------------------------------------------------- ato VI e finais
         IMAGENS.put("ato6_o_preco_01", "cemiterio");
 
-        IMAGENS.put("final1_balanca_01", "policia-federal");
+        IMAGENS.put("final1_balanca_01", "helena-forum");
         IMAGENS.put("final1_balanca_02", "cemiterio");
 
         IMAGENS.put("final2_nevoa_01", "praca-matriz-dia");
-        IMAGENS.put("final2_nevoa_02", "jornal-capa");
+        IMAGENS.put("final2_nevoa_02", "helena-estufa");
 
         IMAGENS.put("final3_sangue_01", "caminhonete-1");
         IMAGENS.put("final3_sangue_02", "caminhonete-2");

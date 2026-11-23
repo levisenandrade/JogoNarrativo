@@ -273,25 +273,41 @@ Para executar: `mvn clean test` (ou, no IntelliJ, botão direito na pasta `test`
 
 ## 7. Instruções de Reprodução
 
+O jogo funciona em **Windows, Linux e macOS**.
+
 ### Pré-requisitos
 
-* JDK 17 ou superior;
-* Apache Maven (baixa JavaFX 21, Gson e JUnit 5 automaticamente).
+* JDK 17 ou superior (confira com `java -version`);
+* Apache Maven (confira com `mvn -version`). O Maven baixa JavaFX 21, Gson e JUnit 5 automaticamente.
 
 ### Passo a passo
 
 1. Clone o repositório:
    ```
-   git clone https://github.com/[USUARIO]/[REPOSITORIO].git
+   git clone https://github.com/levisenandrade/santa-aurora-jogo-narrativo.git
    ```
-2. Entre na pasta do projeto (onde está o `pom.xml`);
-3. Para rodar os testes de unidade: `mvn clean test`;
-4. Para jogar com a interface gráfica: `mvn javafx:run` (classe `PartidaFX`);
-5. Para jogar pelo terminal: `mvn exec:java` (classe `Partida`).
+2. Entre na pasta do projeto (onde está o `pom.xml`):
+   ```
+   cd santa-aurora-jogo-narrativo
+   ```
+3. Para rodar os testes de unidade:
+   ```
+   mvn clean test
+   ```
+4. Para jogar com a interface gráfica (classe `PartidaFX`):
+   ```
+   mvn javafx:run
+   ```
+5. Para jogar pelo terminal (classe `Partida`):
+   ```
+   mvn exec:java
+   ```
 
-> Os arquivos de save e de configuração são gerados em `saves/` na primeira execução.
+### Usando o IntelliJ IDEA
 
----
+Se o comando `mvn` não for reconhecido (comum no Windows), abra a pasta do projeto no IntelliJ, aguarde o Maven carregar e use o painel **Maven**: *Lifecycle > test* para os testes e *Plugins > javafx > javafx:run* para jogar.
+
+> Os arquivos de save e de configuração são gerados na pasta `saves/` na primeira execução.
 
 ## 8. Guia de Uso
 

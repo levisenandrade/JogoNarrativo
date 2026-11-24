@@ -367,4 +367,5 @@ Os vídeos a seguir demonstram o funcionamento do jogo.
 * Documentação do JavaFX (OpenJFX).
 * Documentação da biblioteca JSON utilizada.
 * GAMMA, E.; HELM, R.; JOHNSON, R.; VLISSIDES, J. *Padrões de Projeto: Soluções Reutilizáveis de Software Orientado a Objetos*. Bookman.
+* Krasner, G. E.; Pope, S. T. (1988). A cookbook for using the Model-View-Controller user interface paradigm in Smalltalk-80. Journal of Object-Oriented Programming.
 * Material de aula da disciplina EXA863.

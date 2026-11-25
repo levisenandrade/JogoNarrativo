@@ -102,7 +102,9 @@ O código-fonte fica na pasta `src/`, sem subpacotes (pacote padrão). A separa�
 │   ├── images/cenas/         # imagens das cenas (PNG)
 │   └── *.fxml                # telas JavaFX
 └── saves/                    # gerada na primeira execução (saves e configurações)
+
 ```
+
 ### 4.2. Fluxo geral de uma partida
 
 1. O jogador abre o **menu inicial** (Nova partida, Carregar, Instruções, Créditos, Conquistas, Configurações, Sair);
@@ -121,6 +123,14 @@ A classe `EstadoPartida` concentra tudo o que define uma partida em andamento: o
 As cenas do jogo ficam em arquivos JSON, e não dentro do código. O `CarregadorDeCenas` lê esses arquivos e monta os objetos de cena (texto, diálogos, escolhas, condições e efeitos). Com isso, o conteúdo narrativo pode ser alterado sem recompilar o projeto.
 
 ---
+
+<p align="center">
+  <img width="510" height="180" alt="image" src="https://github.com/user-attachments/assets/02934cc7-ee88-4aeb-8ced-640dcc0bd32f" />
+</p>
+
+<p align="center">
+Fluxo entre Controlador, EventBus e View. A linha tracejada é a resposta do jogador.
+</p>
 
 ## 5. Detalhamento das Funcionalidades
 
